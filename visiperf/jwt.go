@@ -1,5 +1,22 @@
 package visiperf
 
+import (
+	"encoding/base64"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"strings"
+)
+
+// ErrInvalidComposition represent error when JWT is not composed correctly
+const ErrInvalidComposition = "invalid jwt composition"
+
+// ErrInvalidSecret represent error when secret is invalid
+const ErrInvalidSecret = "invalid secret"
+
+// ErrExpiredToken represent error when token is expired
+const ErrExpiredToken = "token expired"
+
 type jwt struct {
 	Header struct {
 		Alg string `json:"alg"`
@@ -18,7 +35,37 @@ type jwt struct {
 }
 
 func newJwtFromToken(token string) (*jwt, error) {
-	return nil, nil
+	var jwt jwt
+
+	ss := strings.Split(token, ".")
+	if len(ss) != 3 {
+		return nil, fmt.Errorf("token splitting error: %w", errors.New(ErrInvalidComposition))
+	}
+
+	// Jwt.Header
+	hDec, err := base64.StdEncoding.DecodeString(ss[0])
+	if err != nil {
+		return nil, fmt.Errorf("base64 decode header error: %w", err)
+	}
+
+	if err := json.Unmarshal(hDec, &jwt.Header); err != nil {
+		return nil, fmt.Errorf("json unmarshal header error: %w", err)
+	}
+
+	// Jwt.Payload
+	pDec, err := base64.StdEncoding.DecodeString(ss[1])
+	if err != nil {
+		return nil, fmt.Errorf("base64 decode payload error: %w", err)
+	}
+
+	if err := json.Unmarshal(pDec, &jwt.Payload); err != nil {
+		return nil, fmt.Errorf("json unmarshal payload error: %w", err)
+	}
+
+	// Jwt.Signature
+	jwt.Signature = string(ss[2])
+
+	return &jwt, nil
 }
 
 func (jwt *jwt) isValid(secret string) error {
