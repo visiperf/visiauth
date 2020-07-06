@@ -17,6 +17,10 @@ type jwt struct {
 	Signature string
 }
 
+func newJwtFromToken(token string) (*jwt, error) {
+	return nil, nil
+}
+
 func (jwt *jwt) isValid(secret string) error {
 	return nil
 }
