@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/visiperf/visiauth"
 )
 
 // ErrInvalidComposition represent error when JWT is not composed correctly
@@ -136,4 +138,23 @@ func (jwt *jwt) toString() (string, error) {
 		base64.StdEncoding.EncodeToString(bh),
 		base64.StdEncoding.EncodeToString(bp),
 	}, "."), nil
+}
+
+func (jwt *jwt) toVisiauthJwt() *visiauth.Jwt {
+	return &visiauth.Jwt{
+		Header: visiauth.Header{
+			Alg: jwt.Header.Alg,
+			Typ: jwt.Header.Typ,
+		},
+		Payload: visiauth.Payload{
+			Iat: jwt.Payload.Iat,
+			Exp: jwt.Payload.Exp,
+			Sub: visiauth.Sub{
+				UserID:    jwt.Payload.Sub.UserID,
+				CompanyID: jwt.Payload.Sub.CompanyID,
+			},
+			Roles: jwt.Payload.Roles,
+		},
+		Signature: jwt.Signature,
+	}
 }
