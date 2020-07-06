@@ -103,7 +103,7 @@ func (jwt *jwt) isExpired() error {
 }
 
 func (jwt *jwt) isUnlimited() bool {
-	return true
+	return jwt.Payload.Exp == "0"
 }
 
 func (jwt *jwt) generateSignature(secret string) (string, error) {
