@@ -10,6 +10,7 @@ type authService struct {
 	secret string
 }
 
+// NewAuthService must be used to instanciate new Visiperf authentication service
 func NewAuthService(secret string) visiauth.AuthService {
 	return &authService{secret: secret}
 }
