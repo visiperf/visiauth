@@ -79,7 +79,7 @@ func (jwt *jwt) isValid(secret string) error {
 	}
 
 	if jwt.Signature != s {
-		return fmt.Errorf("jwt signature validation error: %w", errors.New(ErrInvalidSecret))
+		return errors.New(ErrInvalidSecret)
 	}
 
 	return nil
@@ -99,7 +99,7 @@ func (jwt *jwt) isExpired() error {
 	}
 
 	if exp.Before(time.Now()) {
-		return fmt.Errorf("jwt expiration error: %w", errors.New(ErrExpiredToken))
+		return errors.New(ErrExpiredToken)
 	}
 
 	return nil
