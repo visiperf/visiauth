@@ -16,3 +16,23 @@ type jwt struct {
 	}
 	Signature string
 }
+
+func (jwt *jwt) isValid(secret string) error {
+	return nil
+}
+
+func (jwt *jwt) isExpired() error {
+	return nil
+}
+
+func (jwt *jwt) isUnlimited() bool {
+	return true
+}
+
+func (jwt *jwt) generateSignature() (string, error) {
+	return "", nil
+}
+
+func (jwt *jwt) toString() (string, error) {
+	return "", nil
+}
