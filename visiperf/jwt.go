@@ -15,13 +15,13 @@ import (
 )
 
 // ErrInvalidComposition represent error when JWT is not composed correctly
-const ErrInvalidComposition = "invalid jwt composition"
+var ErrInvalidComposition = errors.New("invalid jwt composition")
 
 // ErrInvalidSecret represent error when secret is invalid
-const ErrInvalidSecret = "invalid secret"
+var ErrInvalidSecret = errors.New("invalid secret")
 
 // ErrExpiredToken represent error when token is expired
-const ErrExpiredToken = "token expired"
+var ErrExpiredToken = errors.New("token expired")
 
 type jwt struct {
 	Header struct {
@@ -45,7 +45,7 @@ func newJwtFromToken(token string) (*jwt, error) {
 
 	ss := strings.Split(token, ".")
 	if len(ss) != 3 {
-		return nil, fmt.Errorf("token splitting error: %w", errors.New(ErrInvalidComposition))
+		return nil, fmt.Errorf("token splitting error: %w", ErrInvalidComposition)
 	}
 
 	// Jwt.Header
@@ -81,7 +81,7 @@ func (jwt *jwt) isValid(secret string) error {
 	}
 
 	if jwt.Signature != s {
-		return errors.New(ErrInvalidSecret)
+		return ErrInvalidSecret
 	}
 
 	return nil
@@ -101,7 +101,7 @@ func (jwt *jwt) isExpired() error {
 	}
 
 	if exp.Before(time.Now()) {
-		return errors.New(ErrExpiredToken)
+		return ErrExpiredToken
 	}
 
 	return nil
