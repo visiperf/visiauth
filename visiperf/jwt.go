@@ -1,7 +1,10 @@
 package visiperf
 
 import (
+	"crypto/hmac"
+	"crypto/sha512"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -107,7 +110,15 @@ func (jwt *jwt) isUnlimited() bool {
 }
 
 func (jwt *jwt) generateSignature(secret string) (string, error) {
-	return "", nil
+	sp, err := jwt.toString()
+	if err != nil {
+		return "", fmt.Errorf("jwt to string conversion error: %w", err)
+	}
+
+	mac := hmac.New(sha512.New, []byte(secret))
+	mac.Write([]byte(sp))
+
+	return hex.EncodeToString(mac.Sum(nil)), nil
 }
 
 func (jwt *jwt) toString() (string, error) {
