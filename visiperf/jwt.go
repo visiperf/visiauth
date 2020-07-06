@@ -122,5 +122,18 @@ func (jwt *jwt) generateSignature(secret string) (string, error) {
 }
 
 func (jwt *jwt) toString() (string, error) {
-	return "", nil
+	bh, err := json.Marshal(&jwt.Header)
+	if err != nil {
+		return "", fmt.Errorf("json marshal header error: %w", err)
+	}
+
+	bp, err := json.Marshal(&jwt.Payload)
+	if err != nil {
+		return "", fmt.Errorf("json marshal payload error: %w", err)
+	}
+
+	return strings.Join([]string{
+		base64.StdEncoding.EncodeToString(bh),
+		base64.StdEncoding.EncodeToString(bp),
+	}, "."), nil
 }
