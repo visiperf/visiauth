@@ -69,6 +69,15 @@ func newJwtFromToken(token string) (*jwt, error) {
 }
 
 func (jwt *jwt) isValid(secret string) error {
+	s, err := jwt.generateSignature(secret)
+	if err != nil {
+		return fmt.Errorf("jwt signature generation error: %w", err)
+	}
+
+	if jwt.Signature != s {
+		return fmt.Errorf("jwt signature validation error: %w", errors.New(ErrInvalidSecret))
+	}
+
 	return nil
 }
 
@@ -80,7 +89,7 @@ func (jwt *jwt) isUnlimited() bool {
 	return true
 }
 
-func (jwt *jwt) generateSignature() (string, error) {
+func (jwt *jwt) generateSignature(secret string) (string, error) {
 	return "", nil
 }
 
