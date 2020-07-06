@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 )
 
 // ErrInvalidComposition represent error when JWT is not composed correctly
@@ -82,6 +83,22 @@ func (jwt *jwt) isValid(secret string) error {
 }
 
 func (jwt *jwt) isExpired() error {
+	if jwt.isUnlimited() {
+		return nil
+	}
+
+	// @todo: do not use location to check jwt expiration
+	loc, _ := time.LoadLocation("Europe/Paris")
+
+	exp, err := time.ParseInLocation("2006-01-02 15:04:05", jwt.Payload.Exp, loc)
+	if err != nil {
+		return fmt.Errorf("jwt expiration parsing error: %w", err)
+	}
+
+	if exp.Before(time.Now()) {
+		return fmt.Errorf("jwt expiration error: %w", errors.New(ErrExpiredToken))
+	}
+
 	return nil
 }
 
