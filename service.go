@@ -13,6 +13,11 @@ type Auth0Service struct {
 	tokenParser TokenParser
 }
 
+/*
+Create a new instance of authentication service using Auth0 provider
+
+default domain: dev-visiperf.eu.auth0.com
+*/
 func NewAuth0Service(options ...Auth0ServiceOption) *Auth0Service {
 	opts := newDefaultAuth0ServiceOptions()
 	for _, opt := range options {
@@ -26,6 +31,7 @@ func NewAuth0Service(options ...Auth0ServiceOption) *Auth0Service {
 	}
 }
 
+// Parse and validate access token
 func (s *Auth0Service) Validate(accessToken string) error {
 	_, err := s.tokenParser.ParseToken(accessToken)
 	return err
@@ -47,6 +53,9 @@ func newDefaultAuth0ServiceOptions() *Auth0ServiceOptions {
 
 type Auth0ServiceOption func(*Auth0ServiceOptions)
 
+/*
+Use this option to change Auth0 domain
+*/
 func WithDomain(domain string) Auth0ServiceOption {
 	return func(opts *Auth0ServiceOptions) {
 		opts.domain = domain
