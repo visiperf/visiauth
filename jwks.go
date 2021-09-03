@@ -64,13 +64,11 @@ type JwkFetcher interface {
 }
 
 type Auth0JwkFetcher struct {
-	domain  string
 	fetcher JwksFetcher
 }
 
 func NewAuth0JwkFetcher(domain string, client HttpClient) *Auth0JwkFetcher {
 	return &Auth0JwkFetcher{
-		domain:  domain,
 		fetcher: NewAuth0JwksFetcher(domain, client),
 	}
 }

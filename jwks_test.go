@@ -92,38 +92,30 @@ func TestAuth0JwksFetcher(t *testing.T) {
 
 func TestAuth0JwkFetcher(t *testing.T) {
 	tests := []struct {
-		name   string
-		client HttpClient
-		kid    string
-		jwk    *Jwk
-		err    error
+		name    string
+		fetcher *Auth0JwkFetcher
+		kid     string
+		jwk     *Jwk
+		err     error
 	}{{
-		name: "error with client",
-		client: NewMocksHttpClient(func(url string) (resp *http.Response, err error) {
-			return nil, errors.New("connection unavailable")
-		}),
-		kid: "azerty",
-		jwk: nil,
-		err: errors.New("connection unavailable"),
-	}, {
 		name: "kid not found",
-		client: NewMocksHttpClient(func(url string) (resp *http.Response, err error) {
+		fetcher: NewAuth0JwkFetcher("domain.io", NewMocksHttpClient(func(url string) (resp *http.Response, err error) {
 			return &http.Response{
 				StatusCode: 200,
 				Body:       io.NopCloser(bytes.NewBuffer([]byte(jwksJsonMocks))),
 			}, nil
-		}),
+		})),
 		kid: "azerty",
 		jwk: nil,
 		err: NewJwkNotFoundError("azerty"),
 	}, {
 		name: "success",
-		client: NewMocksHttpClient(func(url string) (resp *http.Response, err error) {
+		fetcher: NewAuth0JwkFetcher("domain.io", NewMocksHttpClient(func(url string) (resp *http.Response, err error) {
 			return &http.Response{
 				StatusCode: 200,
 				Body:       io.NopCloser(bytes.NewBuffer([]byte(jwksJsonMocks))),
 			}, nil
-		}),
+		})),
 		kid: "rF45rmcRt-gEXpMBzvw3U",
 		jwk: &jwksMocks.Keys[0],
 		err: nil,
@@ -131,7 +123,7 @@ func TestAuth0JwkFetcher(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			jwk, err := NewAuth0JwkFetcher("domain.io", test.client).FetchJwk(test.kid)
+			jwk, err := test.fetcher.FetchJwk(test.kid)
 
 			assert.Equal(t, test.jwk, jwk)
 			assert.Equal(t, test.err, err)
