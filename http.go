@@ -7,13 +7,13 @@ type HttpClient interface {
 }
 
 type MocksHttpClient struct {
-	get func(url string) (resp *http.Response, err error)
+	fn func(url string) (resp *http.Response, err error)
 }
 
-func NewMocksHttpClient(get func(url string) (resp *http.Response, err error)) *MocksHttpClient {
-	return &MocksHttpClient{get}
+func NewMocksHttpClient(fn func(url string) (resp *http.Response, err error)) *MocksHttpClient {
+	return &MocksHttpClient{fn}
 }
 
 func (c *MocksHttpClient) Get(url string) (resp *http.Response, err error) {
-	return c.get(url)
+	return c.fn(url)
 }
