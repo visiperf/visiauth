@@ -46,43 +46,43 @@ const jwksJsonMocks = `
 
 func TestAuth0JwksFetcher(t *testing.T) {
 	tests := []struct {
-		name   string
-		client HttpClient
-		jwks   *Jwks
-		err    error
+		name    string
+		fetcher *Auth0JwksFetcher
+		jwks    *Jwks
+		err     error
 	}{{
 		name: "connection unavailable",
-		client: NewMocksHttpClient(func(url string) (resp *http.Response, err error) {
+		fetcher: NewAuth0JwksFetcher("domain.io", NewMocksHttpClient(func(url string) (resp *http.Response, err error) {
 			return nil, errors.New("connection unavailable")
-		}),
+		})),
 		jwks: nil,
 		err:  errors.New("connection unavailable"),
 	}, {
 		name: "not found",
-		client: NewMocksHttpClient(func(url string) (resp *http.Response, err error) {
+		fetcher: NewAuth0JwksFetcher("domain.io", NewMocksHttpClient(func(url string) (resp *http.Response, err error) {
 			return &http.Response{
 				Status:     "404 Not Found",
 				StatusCode: 404,
 				Body:       io.NopCloser(bytes.NewBuffer([]byte{})),
 			}, nil
-		}),
+		})),
 		jwks: nil,
 		err:  errors.New("404 Not Found"),
 	}, {
 		name: "success",
-		client: NewMocksHttpClient(func(url string) (resp *http.Response, err error) {
+		fetcher: NewAuth0JwksFetcher("domain.io", NewMocksHttpClient(func(url string) (resp *http.Response, err error) {
 			return &http.Response{
 				StatusCode: 200,
 				Body:       io.NopCloser(bytes.NewBuffer([]byte(jwksJsonMocks))),
 			}, nil
-		}),
+		})),
 		jwks: &jwksMocks,
 		err:  nil,
 	}}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			jwks, err := NewAuth0JwksFetcher("domain.io", test.client).FetchJwks()
+			jwks, err := test.fetcher.FetchJwks()
 
 			assert.Equal(t, test.jwks, jwks)
 			assert.Equal(t, test.err, err)
