@@ -11,15 +11,24 @@ type PEMCertificateFetcher interface {
 }
 
 type Auth0PEMCertificateFetcher struct {
-	domain string
+	fetcher   JwkFetcher
+	converter ChainToCertificateConverter
 }
 
-func NewAuth0PEMCertificateFetcher(domain string) *Auth0PEMCertificateFetcher {
-	return &Auth0PEMCertificateFetcher{domain}
+func NewAuth0PEMCertificateFetcher(domain string, client HttpClient) *Auth0PEMCertificateFetcher {
+	return &Auth0PEMCertificateFetcher{
+		fetcher:   NewAuth0JwkFetcher(domain, client),
+		converter: NewWrapChainToCertificateConverter(),
+	}
 }
 
 func (f *Auth0PEMCertificateFetcher) FetchPEMCertificate(token *jwt.Token) ([]byte, error) {
-	panic("not implemented") // TODO: Implement
+	jwk, err := f.fetcher.FetchJwk(token.Header["kid"].(string))
+	if err != nil {
+		return nil, err
+	}
+
+	return []byte(f.converter.ConvertChainToCertificate(jwk.X5c[0])), nil
 }
 
 type ChainToCertificateConverter interface {
