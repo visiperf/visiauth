@@ -18,3 +18,15 @@ func NewJsonDecoder() *JsonDecoder {
 func (d *JsonDecoder) Decode(reader io.ReadCloser, v interface{}) error {
 	return json.NewDecoder(reader).Decode(v)
 }
+
+type MocksDecoder struct {
+	fn func(reader io.ReadCloser, v interface{}) error
+}
+
+func NewMocksDecoder(fn func(reader io.ReadCloser, v interface{}) error) *MocksDecoder {
+	return &MocksDecoder{fn}
+}
+
+func (d *MocksDecoder) Decode(reader io.ReadCloser, v interface{}) error {
+	return d.fn(reader, v)
+}
