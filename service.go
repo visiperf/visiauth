@@ -27,6 +27,7 @@ func NewAuth0Service(options ...Auth0ServiceOption) *Auth0Service {
 
 	return &Auth0Service{
 		tokenParser: NewJwtTokenParser(
+			opts.domain,
 			NewAuth0PEMCertificateFetcher(opts.domain, &http.Client{}),
 		),
 	}

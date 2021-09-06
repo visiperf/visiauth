@@ -2,12 +2,10 @@ package visiauth
 
 import (
 	"fmt"
-
-	"github.com/golang-jwt/jwt"
 )
 
 type PEMCertificateFetcher interface {
-	FetchPEMCertificate(token *jwt.Token) ([]byte, error)
+	FetchPEMCertificate(token Token) ([]byte, error)
 }
 
 type Auth0PEMCertificateFetcher struct {
@@ -22,8 +20,8 @@ func NewAuth0PEMCertificateFetcher(domain string, client HttpClient) *Auth0PEMCe
 	}
 }
 
-func (f *Auth0PEMCertificateFetcher) FetchPEMCertificate(token *jwt.Token) ([]byte, error) {
-	jwk, err := f.fetcher.FetchJwk(token.Header["kid"].(string))
+func (f *Auth0PEMCertificateFetcher) FetchPEMCertificate(token Token) ([]byte, error) {
+	jwk, err := f.fetcher.FetchJwk(token.Header().Kid())
 	if err != nil {
 		return nil, err
 	}
