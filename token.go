@@ -29,6 +29,7 @@ type Claims interface {
 	Scopes() []string
 	OrganizationRoles() map[string]string
 	Roles() []string
+	UserType() string
 }
 
 type JwtToken struct {
@@ -106,6 +107,10 @@ func (c JwtClaims) Roles() []string {
 	return c.MapClaims[c.customKey("roles")].([]string)
 }
 
+func (c JwtClaims) UserType() string {
+	return c.MapClaims[c.customKey("user-type")].(string)
+}
+
 func (c JwtClaims) customKey(key string) string {
 	return fmt.Sprintf("https://%s/claims/%s", c.domain, key)
 }
@@ -143,4 +148,28 @@ func (p *JwtTokenParser) keyFunc(token *jwt.Token) (interface{}, error) {
 
 type TokenToUserConverter interface {
 	ConvertTokenToUser(token Token) User
+}
+
+type TypeTokenToUserConverter struct {
+	instanciators []UserInstanciator
+}
+
+func NewTypeTokenToUserConverter() *TypeTokenToUserConverter {
+	return &TypeTokenToUserConverter{
+		instanciators: []UserInstanciator{
+			NewCustomerUserInstanciator(),
+			NewEmployeeUserInstanciator(),
+		},
+	}
+}
+
+func (c *TypeTokenToUserConverter) ConvertTokenToUser(token Token) User {
+	userType := token.Claims().UserType()
+	for _, i := range c.instanciators {
+		if i.ForType() == userType {
+			return i.InstanciateUser(token)
+		}
+	}
+
+	return nil
 }

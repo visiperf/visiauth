@@ -30,6 +30,7 @@ func NewAuth0Service(options ...Auth0ServiceOption) *Auth0Service {
 			opts.domain,
 			NewAuth0PEMCertificateFetcher(opts.domain, &http.Client{}),
 		),
+		tokenConverter: NewTypeTokenToUserConverter(),
 	}
 }
 

@@ -15,9 +15,48 @@ type User interface {
 	HasOneOfRoles(roles ...string) bool
 }
 
+type UserInstanciator interface {
+	ForType() string
+	InstanciateUser(token Token) User
+}
+
+type CustomerUserInstanciator struct{}
+
+func NewCustomerUserInstanciator() *CustomerUserInstanciator {
+	return &CustomerUserInstanciator{}
+}
+
+func (i *CustomerUserInstanciator) ForType() string {
+	return "customer"
+}
+
+func (i *CustomerUserInstanciator) InstanciateUser(token Token) User {
+	claims := token.Claims()
+	return newCustomer(newUser(claims.Sub(), claims.Scopes()), claims.OrganizationRoles())
+}
+
+type EmployeeUserInstanciator struct{}
+
+func NewEmployeeUserInstanciator() *EmployeeUserInstanciator {
+	return &EmployeeUserInstanciator{}
+}
+
+func (i *EmployeeUserInstanciator) ForType() string {
+	return "employee"
+}
+
+func (i *EmployeeUserInstanciator) InstanciateUser(token Token) User {
+	claims := token.Claims()
+	return newEmployee(newUser(claims.Sub(), claims.Scopes()), claims.Roles())
+}
+
 type user struct {
 	id          string
 	permissions []string
+}
+
+func newUser(id string, permissions []string) user {
+	return user{id, permissions}
 }
 
 func (u user) Id() string {
@@ -35,6 +74,10 @@ func (u user) HasPermission(permission string) bool {
 type customer struct {
 	user
 	roles map[string]string
+}
+
+func newCustomer(user user, roles map[string]string) customer {
+	return customer{user, roles}
 }
 
 func (c customer) OrganizationIds() []string {
@@ -81,6 +124,10 @@ func (c customer) highestRoleInOrganization(organizationId string) string {
 type employee struct {
 	user
 	roles []string
+}
+
+func newEmployee(user user, roles []string) employee {
+	return employee{user, roles}
 }
 
 func (e employee) OrganizationIds() []string {
