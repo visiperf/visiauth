@@ -5,8 +5,8 @@ type User interface {
 	Permissions() []string
 	HasPermission(permission string) bool
 	OrganizationIds() []string
-	OrganizationRoles(organizationId string) []OrganizationRole
-	HasOneOfOrganizationRoles(organizationId string, roles ...OrganizationRole) bool
-	Roles() []Role
-	HasOneOfRoles(roles ...Role) bool
+	OrganizationRoles(organizationId string) []string
+	HasOneOfOrganizationRoles(organizationId string, roles ...string) bool
+	Roles() []string
+	HasOneOfRoles(roles ...string) bool
 }
