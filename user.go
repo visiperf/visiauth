@@ -77,3 +77,34 @@ func (c customer) HasOneOfRoles(roles ...string) bool {
 func (c customer) highestRoleInOrganization(organizationId string) string {
 	return c.roles[organizationId]
 }
+
+type employee struct {
+	user
+	roles []string
+}
+
+func (e employee) OrganizationIds() []string {
+	return []string{}
+}
+
+func (e employee) OrganizationRoles(organizationId string) []string {
+	return []string{}
+}
+
+func (e employee) HasOneOfOrganizationRoles(organizationId string, roles ...string) bool {
+	return false
+}
+
+func (e employee) Roles() []string {
+	return e.roles
+}
+
+func (e employee) HasOneOfRoles(roles ...string) bool {
+	for _, r := range roles {
+		if sliceutil.IsStringInSlice(r, e.roles) {
+			return true
+		}
+	}
+
+	return false
+}

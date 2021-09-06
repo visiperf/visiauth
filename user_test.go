@@ -102,3 +102,52 @@ func TestCustomerHasOneOfOrganizationRoles(t *testing.T) {
 		})
 	}
 }
+
+func TestEmployeeHasOneOfRoles(t *testing.T) {
+	e := employee{
+		roles: []string{
+			RoleExpert.String(),
+		},
+	}
+
+	tests := []struct {
+		name     string
+		employee employee
+		roles    []string
+		res      bool
+	}{{
+		name: "user without roles",
+		employee: employee{
+			roles: nil,
+		},
+		roles: []string{
+			RoleExpert.String(),
+		},
+		res: false,
+	}, {
+		name:     "no roles specified",
+		employee: e,
+		roles:    nil,
+		res:      false,
+	}, {
+		name:     "role is not present",
+		employee: e,
+		roles: []string{
+			RoleAdmin.String(),
+		},
+		res: false,
+	}, {
+		name:     "role is present",
+		employee: e,
+		roles: []string{
+			RoleExpert.String(),
+		},
+		res: true,
+	}}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.res, test.employee.HasOneOfRoles(test.roles...))
+		})
+	}
+}
