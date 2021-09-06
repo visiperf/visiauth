@@ -26,3 +26,7 @@ func (p *JwtTokenParser) keyFunc(token *jwt.Token) (interface{}, error) {
 
 	return jwt.ParseRSAPublicKeyFromPEM(cert)
 }
+
+type TokenToUserConverter interface {
+	ConvertTokenToUser(token *jwt.Token) User
+}

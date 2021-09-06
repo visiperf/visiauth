@@ -10,7 +10,8 @@ type Service interface {
 }
 
 type Auth0Service struct {
-	tokenParser TokenParser
+	tokenParser    TokenParser
+	tokenConverter TokenToUserConverter
 }
 
 /*
@@ -38,7 +39,12 @@ func (s *Auth0Service) Validate(accessToken string) error {
 }
 
 func (s *Auth0Service) User(accessToken string) User {
-	panic("not implemented") // TODO: Implement
+	token, err := s.tokenParser.ParseToken(accessToken)
+	if err != nil {
+		return nil
+	}
+
+	return s.tokenConverter.ConvertTokenToUser(token)
 }
 
 type Auth0ServiceOptions struct {
