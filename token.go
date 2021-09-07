@@ -105,7 +105,12 @@ func (c JwtClaims) Scopes() []string {
 }
 
 func (c JwtClaims) OrganizationRoles() map[string]string {
-	return c.MapClaims[c.customKey("organization_roles")].(map[string]string)
+	roles := make(map[string]string)
+	for k, v := range c.MapClaims[c.customKey("organization_roles")].(map[string]interface{}) {
+		roles[k] = v.(string)
+	}
+
+	return roles
 }
 
 func (c JwtClaims) Roles() []string {
