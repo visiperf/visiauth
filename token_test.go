@@ -12,13 +12,22 @@ func TestJwtToken(t *testing.T) {
 	alg := "RS256"
 	typ := "JWT"
 	userType := "customer"
-	organizationRoles := map[string]string{
+	organizationRolesI := map[string]interface{}{
 		"e6e4a8d5-a05d-49af-afa9-afeaeb6185d1": "OWNER",
 		"a46fd11a-192b-41a1-9777-d626b857161f": "MANAGER",
 		"ac79fa53-2373-4cb3-a5b1-d7a046422415": "BUYER",
 		"a876aa5f-70f6-4ded-92ac-052e4e2bc211": "STANDARD",
 	}
-	roles := []string{
+	organizationRolesS := map[string]string{
+		"e6e4a8d5-a05d-49af-afa9-afeaeb6185d1": "OWNER",
+		"a46fd11a-192b-41a1-9777-d626b857161f": "MANAGER",
+		"ac79fa53-2373-4cb3-a5b1-d7a046422415": "BUYER",
+		"a876aa5f-70f6-4ded-92ac-052e4e2bc211": "STANDARD",
+	}
+	rolesI := []interface{}{
+		"EXPERT",
+	}
+	rolesS := []string{
 		"EXPERT",
 	}
 	iss := "https://dev-visiperf.eu.auth0.com/"
@@ -42,8 +51,8 @@ func TestJwtToken(t *testing.T) {
 
 	token := NewJwtToken(*jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 		"https://dev.visiperf.io/claims/user_type":          userType,
-		"https://dev.visiperf.io/claims/organization_roles": organizationRoles,
-		"https://dev.visiperf.io/claims/roles":              roles,
+		"https://dev.visiperf.io/claims/organization_roles": organizationRolesI,
+		"https://dev.visiperf.io/claims/roles":              rolesI,
 		"iss":                                               iss,
 		"sub":                                               sub,
 		"aud":                                               aud,
@@ -66,8 +75,8 @@ func TestJwtToken(t *testing.T) {
 	assert.Equal(t, exp, claims.Exp())
 	assert.Equal(t, scope, claims.Scope())
 	assert.Equal(t, scopes, claims.Scopes())
-	assert.Equal(t, organizationRoles, claims.OrganizationRoles())
-	assert.Equal(t, roles, claims.Roles())
+	assert.Equal(t, organizationRolesS, claims.OrganizationRoles())
+	assert.Equal(t, rolesS, claims.Roles())
 	assert.Equal(t, userType, claims.UserType())
 }
 
@@ -75,13 +84,13 @@ func TestTypeTokenToUserConverter(t *testing.T) {
 	token := func(userType string) Token {
 		return NewJwtToken(*jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 			"https://dev.visiperf.io/claims/user_type": userType,
-			"https://dev.visiperf.io/claims/organization_roles": map[string]string{
+			"https://dev.visiperf.io/claims/organization_roles": map[string]interface{}{
 				"e6e4a8d5-a05d-49af-afa9-afeaeb6185d1": "OWNER",
 				"a46fd11a-192b-41a1-9777-d626b857161f": "MANAGER",
 				"ac79fa53-2373-4cb3-a5b1-d7a046422415": "BUYER",
 				"a876aa5f-70f6-4ded-92ac-052e4e2bc211": "STANDARD",
 			},
-			"https://dev.visiperf.io/claims/roles": []string{
+			"https://dev.visiperf.io/claims/roles": []interface{}{
 				"EXPERT",
 			},
 			"iss": "https://dev-visiperf.eu.auth0.com/",
