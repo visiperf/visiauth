@@ -21,6 +21,7 @@ type Header interface {
 }
 
 type Claims interface {
+	Iss() string
 	Sub() string
 	Aud() []string
 	Iat() time.Time
@@ -75,6 +76,10 @@ type JwtClaims struct {
 	domain string
 }
 
+func (c JwtClaims) Iss() string {
+	return c.MapClaims["iss"].(string)
+}
+
 func (c JwtClaims) Sub() string {
 	return c.MapClaims["sub"].(string)
 }
@@ -84,11 +89,11 @@ func (c JwtClaims) Aud() []string {
 }
 
 func (c JwtClaims) Iat() time.Time {
-	return time.Unix(c.MapClaims["iat"].(int64), 0)
+	return time.Unix(int64(c.MapClaims["iat"].(int)), 0)
 }
 
 func (c JwtClaims) Exp() time.Time {
-	return time.Unix(c.MapClaims["exp"].(int64), 0)
+	return time.Unix(int64(c.MapClaims["exp"].(int)), 0)
 }
 
 func (c JwtClaims) Scope() string {
@@ -100,7 +105,7 @@ func (c JwtClaims) Scopes() []string {
 }
 
 func (c JwtClaims) OrganizationRoles() map[string]string {
-	return c.MapClaims[c.customKey("organization-roles")].(map[string]string)
+	return c.MapClaims[c.customKey("organization_roles")].(map[string]string)
 }
 
 func (c JwtClaims) Roles() []string {
@@ -108,7 +113,7 @@ func (c JwtClaims) Roles() []string {
 }
 
 func (c JwtClaims) UserType() string {
-	return c.MapClaims[c.customKey("user-type")].(string)
+	return c.MapClaims[c.customKey("user_type")].(string)
 }
 
 func (c JwtClaims) customKey(key string) string {
