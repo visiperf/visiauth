@@ -17,6 +17,7 @@ func main() {
 
 	user := service.User(accessToken)
 
+	log.Printf("%T\n", user)
 	log.Println(user.Id())
 	log.Println(user.Permissions())
 	log.Println(user.Roles())
