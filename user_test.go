@@ -7,7 +7,7 @@ import (
 )
 
 func TestCustomerOrganizationRoles(t *testing.T) {
-	c := customer{
+	c := Customer{
 		roles: map[string]string{
 			"2e141238-9315-4b7f-aaa0-55b9a00c6cdb": OrganizationRoleOwner.String(),
 			"d1845acc-debb-4f71-bda4-eeb8f9a91495": OrganizationRoleStandard.String(),
@@ -16,7 +16,7 @@ func TestCustomerOrganizationRoles(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		customer       customer
+		customer       Customer
 		organizationId string
 		roles          []string
 	}{{
@@ -51,7 +51,7 @@ func TestCustomerOrganizationRoles(t *testing.T) {
 }
 
 func TestCustomerHasOneOfOrganizationRoles(t *testing.T) {
-	c := customer{
+	c := Customer{
 		roles: map[string]string{
 			"2e141238-9315-4b7f-aaa0-55b9a00c6cdb": OrganizationRoleOwner.String(),
 			"d1845acc-debb-4f71-bda4-eeb8f9a91495": OrganizationRoleStandard.String(),
@@ -60,7 +60,7 @@ func TestCustomerHasOneOfOrganizationRoles(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		customer       customer
+		customer       Customer
 		organizationId string
 		roles          []string
 		res            bool
@@ -104,7 +104,7 @@ func TestCustomerHasOneOfOrganizationRoles(t *testing.T) {
 }
 
 func TestEmployeeHasOneOfRoles(t *testing.T) {
-	e := employee{
+	e := Employee{
 		roles: []string{
 			RoleExpert.String(),
 		},
@@ -112,12 +112,12 @@ func TestEmployeeHasOneOfRoles(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		employee employee
+		employee Employee
 		roles    []string
 		res      bool
 	}{{
 		name: "user without roles",
-		employee: employee{
+		employee: Employee{
 			roles: nil,
 		},
 		roles: []string{

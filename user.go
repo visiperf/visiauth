@@ -71,16 +71,16 @@ func (u user) HasPermission(permission string) bool {
 	return sliceutil.IsStringInSlice(permission, u.permissions)
 }
 
-type customer struct {
+type Customer struct {
 	user
 	roles map[string]string
 }
 
-func newCustomer(user user, roles map[string]string) customer {
-	return customer{user, roles}
+func newCustomer(user user, roles map[string]string) Customer {
+	return Customer{user, roles}
 }
 
-func (c customer) OrganizationIds() []string {
+func (c Customer) OrganizationIds() []string {
 	ss := make([]string, 0, len(c.roles))
 	for r := range c.roles {
 		ss = append(ss, r)
@@ -89,7 +89,7 @@ func (c customer) OrganizationIds() []string {
 	return ss
 }
 
-func (c customer) OrganizationRoles(organizationId string) []string {
+func (c Customer) OrganizationRoles(organizationId string) []string {
 	idx := sliceutil.IndexOfStringInSlice(c.highestRoleInOrganization(organizationId), organizationRolesOrdered)
 	if idx >= 0 {
 		return organizationRolesOrdered[idx:]
@@ -98,7 +98,7 @@ func (c customer) OrganizationRoles(organizationId string) []string {
 	return []string{}
 }
 
-func (c customer) HasOneOfOrganizationRoles(organizationId string, roles ...string) bool {
+func (c Customer) HasOneOfOrganizationRoles(organizationId string, roles ...string) bool {
 	rs := c.OrganizationRoles(organizationId)
 	for _, r := range roles {
 		if sliceutil.IsStringInSlice(r, rs) {
@@ -109,44 +109,44 @@ func (c customer) HasOneOfOrganizationRoles(organizationId string, roles ...stri
 	return false
 }
 
-func (c customer) Roles() []string {
+func (c Customer) Roles() []string {
 	return []string{}
 }
 
-func (c customer) HasOneOfRoles(roles ...string) bool {
+func (c Customer) HasOneOfRoles(roles ...string) bool {
 	return false
 }
 
-func (c customer) highestRoleInOrganization(organizationId string) string {
+func (c Customer) highestRoleInOrganization(organizationId string) string {
 	return c.roles[organizationId]
 }
 
-type employee struct {
+type Employee struct {
 	user
 	roles []string
 }
 
-func newEmployee(user user, roles []string) employee {
-	return employee{user, roles}
+func newEmployee(user user, roles []string) Employee {
+	return Employee{user, roles}
 }
 
-func (e employee) OrganizationIds() []string {
+func (e Employee) OrganizationIds() []string {
 	return []string{}
 }
 
-func (e employee) OrganizationRoles(organizationId string) []string {
+func (e Employee) OrganizationRoles(organizationId string) []string {
 	return []string{}
 }
 
-func (e employee) HasOneOfOrganizationRoles(organizationId string, roles ...string) bool {
+func (e Employee) HasOneOfOrganizationRoles(organizationId string, roles ...string) bool {
 	return false
 }
 
-func (e employee) Roles() []string {
+func (e Employee) Roles() []string {
 	return e.roles
 }
 
-func (e employee) HasOneOfRoles(roles ...string) bool {
+func (e Employee) HasOneOfRoles(roles ...string) bool {
 	for _, r := range roles {
 		if sliceutil.IsStringInSlice(r, e.roles) {
 			return true

@@ -111,12 +111,12 @@ func TestTypeTokenToUserConverter(t *testing.T) {
 		name:      "type customer",
 		converter: NewTypeTokenToUserConverter(),
 		token:     token("customer"),
-		user:      customer{},
+		user:      Customer{},
 	}, {
 		name:      "type employee",
 		converter: NewTypeTokenToUserConverter(),
 		token:     token("employee"),
-		user:      employee{},
+		user:      Employee{},
 	}}
 
 	for _, test := range tests {
