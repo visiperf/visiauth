@@ -114,7 +114,12 @@ func (c JwtClaims) OrganizationRoles() map[string]string {
 }
 
 func (c JwtClaims) Roles() []string {
-	return c.MapClaims[c.customKey("roles")].([]string)
+	roles := make([]string, 0)
+	for _, r := range c.MapClaims[c.customKey("roles")].([]interface{}) {
+		roles = append(roles, r.(string))
+	}
+
+	return roles
 }
 
 func (c JwtClaims) UserType() string {
