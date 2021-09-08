@@ -181,7 +181,7 @@ func NewTypeTokenToUserConverter() *TypeTokenToUserConverter {
 func (c *TypeTokenToUserConverter) ConvertTokenToUser(token Token) User {
 	userType := token.Claims().UserType()
 	for _, i := range c.instanciators {
-		if i.ForType() == userType {
+		if i.ForType(userType) {
 			return i.InstanciateUser(token)
 		}
 	}

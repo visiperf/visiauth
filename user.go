@@ -16,7 +16,7 @@ type User interface {
 }
 
 type UserInstanciator interface {
-	ForType() string
+	ForType(userType string) bool
 	InstanciateUser(token Token) User
 }
 
@@ -26,8 +26,8 @@ func NewCustomerUserInstanciator() *CustomerUserInstanciator {
 	return &CustomerUserInstanciator{}
 }
 
-func (i *CustomerUserInstanciator) ForType() string {
-	return "customer"
+func (i *CustomerUserInstanciator) ForType(userType string) bool {
+	return userType == "customer"
 }
 
 func (i *CustomerUserInstanciator) InstanciateUser(token Token) User {
@@ -41,8 +41,8 @@ func NewEmployeeUserInstanciator() *EmployeeUserInstanciator {
 	return &EmployeeUserInstanciator{}
 }
 
-func (i *EmployeeUserInstanciator) ForType() string {
-	return "employee"
+func (i *EmployeeUserInstanciator) ForType(userType string) bool {
+	return userType == "employee"
 }
 
 func (i *EmployeeUserInstanciator) InstanciateUser(token Token) User {
