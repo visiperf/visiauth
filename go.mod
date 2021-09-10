@@ -1,4 +1,4 @@
-module github.com/visiperf/visiauth
+module github.com/visiperf/visiauth/v2
 
 go 1.16
 
