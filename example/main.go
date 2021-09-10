@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/visiperf/visiauth"
+	"github.com/visiperf/visiauth/v2"
 )
 
 func main() {
