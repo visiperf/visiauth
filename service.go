@@ -3,6 +3,7 @@ package visiauth
 import "net/http"
 
 const defaultAuth0Domain = "dev-visiperf.eu.auth0.com"
+const defaultAuth0Namespace = "dev.visiperf.io"
 
 type Service interface {
 	Validate(accessToken string) error
@@ -27,7 +28,7 @@ func NewAuth0Service(options ...Auth0ServiceOption) *Auth0Service {
 
 	return &Auth0Service{
 		tokenParser: NewJwtTokenParser(
-			opts.domain,
+			opts.namespace,
 			NewAuth0PEMCertificateFetcher(opts.domain, &http.Client{}),
 		),
 		tokenConverter: NewTypeTokenToUserConverter(),
@@ -40,6 +41,7 @@ func (s *Auth0Service) Validate(accessToken string) error {
 	return err
 }
 
+// Return authenticated User, nil if token is invalid
 func (s *Auth0Service) User(accessToken string) User {
 	token, err := s.tokenParser.ParseToken(accessToken)
 	if err != nil {
@@ -50,12 +52,14 @@ func (s *Auth0Service) User(accessToken string) User {
 }
 
 type Auth0ServiceOptions struct {
-	domain string
+	domain    string
+	namespace string
 }
 
 func newDefaultAuth0ServiceOptions() *Auth0ServiceOptions {
 	return &Auth0ServiceOptions{
-		domain: defaultAuth0Domain,
+		domain:    defaultAuth0Domain,
+		namespace: defaultAuth0Namespace,
 	}
 }
 
@@ -67,5 +71,14 @@ Use this option to change Auth0 domain
 func WithDomain(domain string) Auth0ServiceOption {
 	return func(opts *Auth0ServiceOptions) {
 		opts.domain = domain
+	}
+}
+
+/*
+Use this option to change Auth0 namespace
+*/
+func WithNamespace(namespace string) Auth0ServiceOption {
+	return func(opts *Auth0ServiceOptions) {
+		opts.namespace = namespace
 	}
 }

@@ -35,11 +35,11 @@ type Claims interface {
 
 type JwtToken struct {
 	jwt.Token
-	domain string
+	namespace string
 }
 
-func NewJwtToken(token jwt.Token, domain string) JwtToken {
-	return JwtToken{token, domain}
+func NewJwtToken(token jwt.Token, namespace string) JwtToken {
+	return JwtToken{token, namespace}
 }
 
 func (t JwtToken) Header() Header {
@@ -48,7 +48,7 @@ func (t JwtToken) Header() Header {
 
 func (t JwtToken) Claims() Claims {
 	return JwtClaims{
-		domain:    t.domain,
+		namespace: t.namespace,
 		MapClaims: t.Token.Claims.(jwt.MapClaims),
 	}
 }
@@ -73,7 +73,7 @@ func (h JwtHeader) Kid() string {
 
 type JwtClaims struct {
 	jwt.MapClaims
-	domain string
+	namespace string
 }
 
 func (c JwtClaims) Iss() string {
@@ -127,7 +127,7 @@ func (c JwtClaims) UserType() string {
 }
 
 func (c JwtClaims) customKey(key string) string {
-	return fmt.Sprintf("https://%s/claims/%s", c.domain, key)
+	return fmt.Sprintf("https://%s/claims/%s", c.namespace, key)
 }
 
 type TokenParser interface {
@@ -135,12 +135,12 @@ type TokenParser interface {
 }
 
 type JwtTokenParser struct {
-	domain             string
+	namespace          string
 	certificateFetcher PEMCertificateFetcher
 }
 
-func NewJwtTokenParser(domain string, certificateFetcher PEMCertificateFetcher) *JwtTokenParser {
-	return &JwtTokenParser{domain, certificateFetcher}
+func NewJwtTokenParser(namespace string, certificateFetcher PEMCertificateFetcher) *JwtTokenParser {
+	return &JwtTokenParser{namespace, certificateFetcher}
 }
 
 func (p *JwtTokenParser) ParseToken(accessToken string) (Token, error) {
@@ -149,11 +149,11 @@ func (p *JwtTokenParser) ParseToken(accessToken string) (Token, error) {
 		return nil, err
 	}
 
-	return NewJwtToken(*token, p.domain), nil
+	return NewJwtToken(*token, p.namespace), nil
 }
 
 func (p *JwtTokenParser) keyFunc(token *jwt.Token) (interface{}, error) {
-	cert, err := p.certificateFetcher.FetchPEMCertificate(NewJwtToken(*token, p.domain))
+	cert, err := p.certificateFetcher.FetchPEMCertificate(NewJwtToken(*token, p.namespace))
 	if err != nil {
 		return nil, err
 	}
