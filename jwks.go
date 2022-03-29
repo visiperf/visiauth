@@ -15,19 +15,15 @@ type Jwks struct {
 	Keys []*Jwk `json:"keys"`
 }
 
-type JwksFetcher interface {
-	FetchJwks() (*Jwks, error)
-}
-
-type Auth0JwksFetcher struct {
+type JwksFetcher struct {
 	domain string
 }
 
-func NewAuth0JwksFetcher(domain string) *Auth0JwksFetcher {
-	return &Auth0JwksFetcher{domain}
+func NewJwksFetcher(domain string) *JwksFetcher {
+	return &JwksFetcher{domain}
 }
 
-func (f *Auth0JwksFetcher) FetchJwks() (*Jwks, error) {
+func (f *JwksFetcher) FetchJwks() (*Jwks, error) {
 	resp, err := http.Get(f.url())
 	if err != nil {
 		return nil, err
@@ -46,6 +42,6 @@ func (f *Auth0JwksFetcher) FetchJwks() (*Jwks, error) {
 	return &jwks, nil
 }
 
-func (f *Auth0JwksFetcher) url() string {
+func (f *JwksFetcher) url() string {
 	return fmt.Sprintf(auth0JwksUrl, f.domain)
 }
