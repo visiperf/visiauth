@@ -7,17 +7,17 @@ import (
 	"github.com/visiperf/visiauth/v3"
 )
 
-type Auth0JwkFetcher struct {
+type JwkFetcher struct {
 	jwksFetcher *JwksFetcher
 }
 
-func NewAuth0JwkFetcher(domain string) *Auth0JwkFetcher {
-	return &Auth0JwkFetcher{
+func NewJwkFetcher(domain string) *JwkFetcher {
+	return &JwkFetcher{
 		jwksFetcher: NewJwksFetcher(domain),
 	}
 }
 
-func (f *Auth0JwkFetcher) FetchJwk(_ context.Context, kid string) (*visiauth.Jwk, error) {
+func (f *JwkFetcher) FetchJwk(_ context.Context, kid string) (*visiauth.Jwk, error) {
 	jwks, err := f.jwksFetcher.FetchJwks()
 	if err != nil {
 		return nil, err
