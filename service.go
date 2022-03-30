@@ -28,14 +28,15 @@ func (s *Service) User(ctx context.Context, accessToken string) (User, error) {
 	}
 
 	claims := token.Claims.(jwt.MapClaims)
+	userId := strings.ReplaceAll(claims["sub"].(string), "auth0|", "")
 
-	organizations, err := neo4j.FetchOrganizationsByUser(ctx, claims["sub"].(string))
+	organizations, err := neo4j.FetchOrganizationsByUser(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
 
 	return NewCustomer(
-		claims["sub"].(string),
+		userId,
 		strings.Split(claims["scope"].(string), " "),
 		organizations,
 	), nil
