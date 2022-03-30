@@ -11,10 +11,10 @@ type JwkFetcher struct {
 	client *redis.Client
 }
 
-func NewJwkFetcher(addr string) *JwkFetcher {
+func NewJwkFetcher() *JwkFetcher {
 	return &JwkFetcher{
 		client: redis.NewClient(&redis.Options{
-			Addr: addr,
+			Addr: env.Redis.Addr,
 		}),
 	}
 }
