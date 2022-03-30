@@ -35,6 +35,7 @@ func (s *Service) User(ctx context.Context, accessToken string) (User, error) {
 		return nil, err
 	}
 
+	// TODO: implement customer or employee depending on user type
 	return NewCustomer(
 		userId,
 		strings.Split(claims["scope"].(string), " "),
