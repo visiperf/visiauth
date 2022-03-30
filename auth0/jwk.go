@@ -17,8 +17,8 @@ func NewJwkFetcher(domain string) *JwkFetcher {
 	}
 }
 
-func (f *JwkFetcher) FetchJwk(_ context.Context, kid string) (*visiauth.Jwk, error) {
-	jwks, err := f.jwksFetcher.FetchJwks()
+func (f *JwkFetcher) FetchJwk(ctx context.Context, kid string) (*visiauth.Jwk, error) {
+	jwks, err := f.jwksFetcher.FetchJwks(ctx)
 	if err != nil {
 		return nil, err
 	}

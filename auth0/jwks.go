@@ -1,6 +1,7 @@
 package auth0
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -21,7 +22,7 @@ func NewJwksFetcher(domain string) *JwksFetcher {
 	return &JwksFetcher{domain}
 }
 
-func (f *JwksFetcher) FetchJwks() (*visiauth.Jwks, error) {
+func (f *JwksFetcher) FetchJwks(_ context.Context) (*visiauth.Jwks, error) {
 	resp, err := http.Get(fmt.Sprintf(jwksUrl, f.domain))
 	if err != nil {
 		return nil, err
