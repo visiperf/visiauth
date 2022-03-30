@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/visiperf/visiauth/v3/neo4j"
 )
 
 type Service struct {
@@ -28,11 +29,14 @@ func (s *Service) User(ctx context.Context, accessToken string) (User, error) {
 
 	claims := token.Claims.(jwt.MapClaims)
 
-	// TODO: fetch organizations by user id in neo4j
+	organizations, err := neo4j.FetchOrganizationsByUser(ctx, claims["sub"].(string))
+	if err != nil {
+		return nil, err
+	}
 
 	return NewCustomer(
 		claims["sub"].(string),
 		strings.Split(claims["scope"].(string), " "),
-		nil,
+		organizations,
 	), nil
 }
