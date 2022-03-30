@@ -18,8 +18,8 @@ type JwksFetcher struct {
 	domain string
 }
 
-func NewJwksFetcher(domain string) *JwksFetcher {
-	return &JwksFetcher{domain}
+func NewJwksFetcher() *JwksFetcher {
+	return &JwksFetcher{env.Auth0.Domain}
 }
 
 func (f *JwksFetcher) FetchJwks(_ context.Context) (*visiauth.Jwks, error) {

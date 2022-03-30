@@ -11,9 +11,9 @@ type JwkFetcher struct {
 	jwksFetcher *JwksFetcher
 }
 
-func NewJwkFetcher(domain string) *JwkFetcher {
+func NewJwkFetcher() *JwkFetcher {
 	return &JwkFetcher{
-		jwksFetcher: NewJwksFetcher(domain),
+		jwksFetcher: NewJwksFetcher(),
 	}
 }
 
