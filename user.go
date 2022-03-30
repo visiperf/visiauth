@@ -41,6 +41,10 @@ type Customer struct {
 	organizations map[string]string
 }
 
+func NewCustomer(id string, scopes []string, organizations map[string]string) *Customer {
+	return &Customer{id, scopes, organizations}
+}
+
 func (c Customer) ID() string {
 	return c.id
 }
