@@ -31,8 +31,8 @@ type User interface {
 	Scopes() []string
 	HasScope(scope string) bool
 	OrganizationIds() []string
-	OrganizationRoles(organizationId string) []string
-	HasOneOfOrganizationRoles(organizationId string, roles ...string) bool
+	RolesInOrganization(organizationId string) []string
+	HasOneOfRolesInOrganization(organizationId string, roles ...string) bool
 }
 
 type Customer struct {
@@ -69,7 +69,7 @@ func (c Customer) OrganizationIds() []string {
 	return maps.Keys(c.organizations)
 }
 
-func (c Customer) OrganizationRoles(organizationId string) []string {
+func (c Customer) RolesInOrganization(organizationId string) []string {
 	if role, ok := c.organizations[organizationId]; ok {
 		return c.rolesIncludedIn(role)
 	}
@@ -77,8 +77,8 @@ func (c Customer) OrganizationRoles(organizationId string) []string {
 	return nil
 }
 
-func (c Customer) HasOneOfOrganizationRoles(organizationId string, roles ...string) bool {
-	rs := c.OrganizationRoles(organizationId)
+func (c Customer) HasOneOfRolesInOrganization(organizationId string, roles ...string) bool {
+	rs := c.RolesInOrganization(organizationId)
 	for _, role := range roles {
 		if sliceutil.IsStringInSlice(role, rs) {
 			return true
