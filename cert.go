@@ -3,8 +3,6 @@ package visiauth
 import (
 	"context"
 	"fmt"
-
-	"github.com/golang-jwt/jwt"
 )
 
 type CertificateFetcher struct {
@@ -15,8 +13,8 @@ func NewCertificateFetcher(jwkFetcher JwkFetcher) *CertificateFetcher {
 	return &CertificateFetcher{jwkFetcher}
 }
 
-func (f *CertificateFetcher) FetchPEMCertificate(ctx context.Context, token *jwt.Token) ([]byte, error) {
-	jwk, err := f.jwkFetcher.FetchJwk(ctx, token.Header["kid"].(string))
+func (f *CertificateFetcher) FetchPEMCertificate(ctx context.Context, token *Token) ([]byte, error) {
+	jwk, err := f.jwkFetcher.FetchJwk(ctx, token.Kid())
 	if err != nil {
 		return nil, err
 	}
