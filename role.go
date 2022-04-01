@@ -7,6 +7,7 @@ const (
 	RoleManager  string = "manager"
 	RoleBuyer    string = "buyer"
 	RoleStandard string = "standard"
+	RoleSupport  string = "support"
 )
 
 // ! keep roles order

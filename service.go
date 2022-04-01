@@ -16,6 +16,7 @@ func NewService(jwkFetcher JwkFetcher) *Service {
 		tokenParser: NewTokenParser(jwkFetcher),
 		instanciators: map[UserType]func(id string, scopes []string, organizations map[string]string) User{
 			UserTypeCustomer: NewCustomer,
+			UserTypeEmployee: NewEmployee,
 		},
 	}
 }
