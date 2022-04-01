@@ -39,8 +39,13 @@ func (c Customer) OrganizationIds() []string {
 	return maps.Keys(c.organizations)
 }
 
-func (c Customer) OrganizationRoles() map[string]string {
-	return c.organizations
+func (c Customer) OrganizationRoles() map[string][]string {
+	m := make(map[string][]string)
+	for _, id := range c.OrganizationIds() {
+		m[id] = c.RolesInOrganization(id)
+	}
+
+	return m
 }
 
 func (c Customer) RolesInOrganization(organizationId string) []string {
