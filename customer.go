@@ -11,12 +11,20 @@ type Customer struct {
 	organizations map[string]string
 }
 
-func NewCustomer(id string, scopes []string, organizations map[string]string) *Customer {
+func NewCustomer(id string, scopes []string, organizations map[string]string) User {
 	return &Customer{id, scopes, organizations}
 }
 
 func (c Customer) ID() string {
 	return c.id
+}
+
+func (c Customer) Type() UserType {
+	return UserTypeCustomer
+}
+
+func (c Customer) IsType(userType UserType) bool {
+	return c.Type().Is(userType)
 }
 
 func (c Customer) Scopes() []string {

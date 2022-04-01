@@ -2,18 +2,22 @@ package visiauth
 
 import (
 	"context"
-	"strings"
 
-	"github.com/golang-jwt/jwt"
 	"github.com/visiperf/visiauth/v3/neo4j"
 )
 
 type Service struct {
-	tokenParser *TokenParser
+	tokenParser   *TokenParser
+	instanciators map[UserType]func(id string, scopes []string, organizations map[string]string) User
 }
 
 func NewService(jwkFetcher JwkFetcher) *Service {
-	return &Service{NewTokenParser(jwkFetcher)}
+	return &Service{
+		tokenParser: NewTokenParser(jwkFetcher),
+		instanciators: map[UserType]func(id string, scopes []string, organizations map[string]string) User{
+			UserTypeCustomer: NewCustomer,
+		},
+	}
 }
 
 func (s *Service) Validate(ctx context.Context, accessToken string) error {
@@ -27,18 +31,10 @@ func (s *Service) User(ctx context.Context, accessToken string) (User, error) {
 		return nil, err
 	}
 
-	claims := token.Claims.(jwt.MapClaims)
-	userId := strings.ReplaceAll(claims["sub"].(string), "auth0|", "")
-
-	organizations, err := neo4j.FetchOrganizationsByUser(ctx, userId)
+	user, err := neo4j.FetchUserByID(ctx, token.UserID(), token.Scopes())
 	if err != nil {
 		return nil, err
 	}
 
-	// TODO: implement customer or employee depending on user type
-	return NewCustomer(
-		userId,
-		strings.Split(claims["scope"].(string), " "),
-		organizations,
-	), nil
+	return s.instanciators[UserType(user.Type)](user.Id, token.Scopes(), user.Organizations), nil
 }
