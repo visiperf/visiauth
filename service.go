@@ -31,7 +31,7 @@ func (s *Service) User(ctx context.Context, accessToken string) (User, error) {
 		return nil, err
 	}
 
-	user, err := neo4j.FetchUserByID(ctx, token.UserID(), token.Scopes())
+	user, err := neo4j.FetchUserByID(ctx, token.UserID())
 	if err != nil {
 		return nil, err
 	}
