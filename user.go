@@ -1,32 +1,60 @@
 package visiauth
 
-const (
-	UserTypeCustomer UserType = "customer"
-	UserTypeEmployee UserType = "employee"
+import (
+	"github.com/bitrise-io/go-utils/sliceutil"
+	"golang.org/x/exp/maps"
 )
 
-type UserType string
-
-func (ut UserType) Equals(userType UserType) bool {
-	return ut.String() == userType.String()
+type User struct {
+	id            string
+	scopes        []string
+	organizations map[string]string
 }
 
-func (ut UserType) Is(userType UserType) bool {
-	return ut.Equals(userType)
+func NewUser(id string, scopes []string, organizations map[string]string) *User {
+	return &User{id, scopes, organizations}
 }
 
-func (ut UserType) String() string {
-	return string(ut)
+func (u User) ID() string {
+	return u.id
 }
 
-type User interface {
-	ID() string
-	Type() UserType
-	IsType(userType UserType) bool
-	Scopes() []string
-	HasScope(scope string) bool
-	OrganizationIds() []string
-	OrganizationRoles() map[string][]string
-	RolesInOrganization(organizationId string) []string
-	HasOneOfRolesInOrganization(organizationId string, roles ...string) bool
+func (u User) Scopes() []string {
+	return u.scopes
+}
+
+func (u User) HasScope(scope string) bool {
+	return sliceutil.IsStringInSlice(scope, u.scopes)
+}
+
+func (u User) OrganizationIds() []string {
+	return maps.Keys(u.organizations)
+}
+
+func (u User) OrganizationRoles() map[string][]string {
+	m := make(map[string][]string)
+	for _, id := range u.OrganizationIds() {
+		m[id] = u.RolesInOrganization(id)
+	}
+
+	return m
+}
+
+func (u User) RolesInOrganization(organizationId string) []string {
+	if role, ok := u.organizations[organizationId]; ok {
+		return mRolesIncludedInRole[role]
+	}
+
+	return nil
+}
+
+func (u User) HasOneOfRolesInOrganization(organizationId string, roles ...string) bool {
+	rs := u.RolesInOrganization(organizationId)
+	for _, role := range roles {
+		if sliceutil.IsStringInSlice(role, rs) {
+			return true
+		}
+	}
+
+	return false
 }

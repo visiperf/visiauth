@@ -14,13 +14,16 @@ func FetchUserByID(ctx context.Context, userId string) (*User, error) {
 	defer session.Close()
 
 	res, err := session.Run(`
-		match (u:User {user_id: $userId})-[ruo:WORKS_AT|BUY_FOR|MANAGE|OWN|DEALS_WITH]->(o:Organization)
-		return o.uuid as organization_uuid, type(ruo) as role, u.user_type as type
+		match (u:User {user_id: $user_id})-[ruo:WORKS_AT|BUY_FOR|MANAGE|OWN|DEALS_WITH]->(o:Organization)
+		return o.organization_id as organization_id, type(ruo) as role
 		union all
-		match (u:User {user_id: $userId})-[ruh:WORKS_AT|BUY_FOR|MANAGE|OWN|DEALS_WITH]->(h:Organization)-[rhn:HEAD_OF]->(n:Network)<-[ron:IN]-(o:Organization)
-		return o.uuid as organization_uuid, 'WORKS_AT' as role, u.user_type as type
+		match (u:User {user_id: $user_id})-[ruh:WORKS_AT|BUY_FOR|MANAGE|OWN]->(h:Organization)-[rhn:HEAD_OF]->(n:Network)<-[ron:IN]-(o:Organization)
+		return o.organization_id as organization_id, 'WORKS_AT' as role
+		union all
+		match (u:User {user_id: $user_id})-[ruh:DEALS_WITH]->(h:Organization)-[rhn:HEAD_OF]->(n:Network)<-[ron:IN]-(o:Organization)
+		return o.organization_id as organization_id, 'DEALS_WITH' as role
 	`, map[string]interface{}{
-		"userId": userId,
+		"user_id": userId,
 	})
 	if err != nil {
 		return nil, err
@@ -30,7 +33,6 @@ func FetchUserByID(ctx context.Context, userId string) (*User, error) {
 	for res.Next() {
 		values := res.Record().Values
 		u.Organizations[values[0].(string)] = mRoles[values[1].(string)]
-		u.Type = values[2].(string)
 	}
 
 	if err := res.Err(); err != nil {
@@ -42,6 +44,5 @@ func FetchUserByID(ctx context.Context, userId string) (*User, error) {
 
 type User struct {
 	Id            string
-	Type          string
 	Organizations map[string]string
 }

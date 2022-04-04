@@ -7,17 +7,12 @@ import (
 )
 
 type Service struct {
-	tokenParser   *TokenParser
-	instanciators map[UserType]func(id string, scopes []string, organizations map[string]string) User
+	tokenParser *TokenParser
 }
 
 func NewService(jwkFetcher JwkFetcher) *Service {
 	return &Service{
 		tokenParser: NewTokenParser(jwkFetcher),
-		instanciators: map[UserType]func(id string, scopes []string, organizations map[string]string) User{
-			UserTypeCustomer: NewCustomer,
-			UserTypeEmployee: NewEmployee,
-		},
 	}
 }
 
@@ -26,7 +21,7 @@ func (s *Service) Validate(ctx context.Context, accessToken string) error {
 	return err
 }
 
-func (s *Service) User(ctx context.Context, accessToken string) (User, error) {
+func (s *Service) User(ctx context.Context, accessToken string) (*User, error) {
 	token, err := s.tokenParser.ParseToken(ctx, accessToken)
 	if err != nil {
 		return nil, err
@@ -37,5 +32,5 @@ func (s *Service) User(ctx context.Context, accessToken string) (User, error) {
 		return nil, err
 	}
 
-	return s.instanciators[UserType(user.Type)](user.Id, token.Scopes(), user.Organizations), nil
+	return NewUser(user.Id, token.Scopes(), user.Organizations), nil
 }

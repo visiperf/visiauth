@@ -1,7 +1,5 @@
 package visiauth
 
-import "github.com/bitrise-io/go-utils/sliceutil"
-
 const (
 	RoleOwner    string = "owner"
 	RoleManager  string = "manager"
@@ -10,15 +8,26 @@ const (
 	RoleSupport  string = "support"
 )
 
-// ! keep roles order
-// TODO: Use weight instead of index to include roles
-var roles = []string{
-	RoleOwner,
-	RoleManager,
-	RoleBuyer,
-	RoleStandard,
-}
-
-func indexOfRole(role string) int {
-	return sliceutil.IndexOfStringInSlice(role, roles)
+var mRolesIncludedInRole = map[string][]string{
+	RoleOwner: {
+		RoleOwner,
+		RoleManager,
+		RoleBuyer,
+		RoleStandard,
+	},
+	RoleManager: {
+		RoleManager,
+		RoleBuyer,
+		RoleStandard,
+	},
+	RoleBuyer: {
+		RoleBuyer,
+		RoleStandard,
+	},
+	RoleStandard: {
+		RoleStandard,
+	},
+	RoleSupport: {
+		RoleSupport,
+	},
 }
