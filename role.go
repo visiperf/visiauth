@@ -11,6 +11,7 @@ const (
 )
 
 // ! keep roles order
+// TODO: Use weight instead of index to include roles
 var roles = []string{
 	RoleOwner,
 	RoleManager,
