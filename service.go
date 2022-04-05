@@ -3,7 +3,7 @@ package visiauth
 import (
 	"context"
 
-	"github.com/visiperf/visiauth/v3/neo4j"
+	"github.com/visiperf/visiauth/v2/neo4j"
 )
 
 type Service struct {

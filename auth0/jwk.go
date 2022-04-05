@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/visiperf/visiauth/v3"
+	"github.com/visiperf/visiauth/v2"
 )
 
 type JwkFetcher struct {
