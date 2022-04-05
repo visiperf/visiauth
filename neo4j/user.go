@@ -23,13 +23,16 @@ func FetchUserByID(ctx context.Context, userId string) (*User, error) {
 		match (u:User {user_id: $user_id})-[ruh:DEALS_WITH]->(h:Organization)-[rhn:HEAD_OF]->(n:Network)<-[ron:IN]-(o:Organization)
 		return o.organization_id as organization_id, 'DEALS_WITH' as role
 	`, map[string]interface{}{
-		"user_id": userId,
+		"user_id": uid,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	u := User{Id: uid}
+	u := User{
+		Id:            uid,
+		Organizations: make(map[string]string),
+	}
 	for res.Next() {
 		values := res.Record().Values
 		u.Organizations[values[0].(string)] = mRoles[values[1].(string)]
