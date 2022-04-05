@@ -29,7 +29,7 @@ func (t Token) Claims() map[string]interface{} {
 }
 
 func (t Token) UserID() string {
-	return t.customKey("user_id")
+	return t.Claims()[t.customKey("user_id")].(string)
 }
 
 func (t Token) Iss() string {
@@ -45,7 +45,7 @@ func (t Token) scope() string {
 }
 
 func (t Token) customKey(key string) string {
-	return fmt.Sprintf("https://%s%s", t.Iss(), key)
+	return fmt.Sprintf("%s%s", t.Iss(), key)
 }
 
 type TokenParser struct {
