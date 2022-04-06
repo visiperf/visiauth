@@ -2,10 +2,19 @@ package visiauth
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/golang-jwt/jwt"
+	"google.golang.org/grpc/metadata"
+)
+
+const AuthorizationKey = "Authorization"
+
+var (
+	ErrMissingMetadata      = errors.New("Missing metadata in context")
+	ErrMissingAuthorization = errors.New("Missing authorization key in metadata")
 )
 
 type Token struct {
@@ -74,4 +83,18 @@ func (p *TokenParser) keyFunc(ctx context.Context) func(token *jwt.Token) (inter
 
 		return jwt.ParseRSAPublicKeyFromPEM(cert)
 	}
+}
+
+func RetrieveTokenFromContext(ctx context.Context) (string, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return "", ErrMissingMetadata
+	}
+
+	bearer := md.Get(AuthorizationKey)
+	if len(bearer) <= 0 {
+		return "", ErrMissingAuthorization
+	}
+
+	return strings.TrimPrefix(bearer[0], "Bearer "), nil
 }
