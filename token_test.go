@@ -2,6 +2,7 @@ package visiauth
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,6 +32,36 @@ func TestRetrieveTokenFromContext(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			token, err := RetrieveTokenFromContext(test.ctx)
+
+			assert.Equal(t, test.token, token)
+			assert.Equal(t, test.err, err)
+		})
+	}
+}
+
+func TestRetrieveTokenFromRequest(t *testing.T) {
+	tests := []struct {
+		name  string
+		req   *http.Request
+		token string
+		err   error
+	}{{
+		name: "empty authorization",
+		req:  &http.Request{},
+		err:  ErrMissingAuthorization,
+	}, {
+		name: "ok",
+		req: &http.Request{
+			Header: http.Header{
+				AuthorizationKey: {"Bearer abc.def.ghi"},
+			},
+		},
+		token: "abc.def.ghi",
+	}}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			token, err := RetrieveTokenFromRequest(test.req)
 
 			assert.Equal(t, test.token, token)
 			assert.Equal(t, test.err, err)

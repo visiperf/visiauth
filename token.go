@@ -4,17 +4,21 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/golang-jwt/jwt"
 	"google.golang.org/grpc/metadata"
 )
 
-const AuthorizationKey = "Authorization"
+const (
+	AuthorizationKey    = "Authorization"
+	authorizationPrefix = "Bearer "
+)
 
 var (
-	ErrMissingMetadata      = errors.New("Missing metadata in context")
-	ErrMissingAuthorization = errors.New("Missing authorization key in metadata")
+	ErrMissingMetadata      = errors.New("missing metadata")
+	ErrMissingAuthorization = errors.New("missing authorization")
 )
 
 type Token struct {
@@ -96,5 +100,14 @@ func RetrieveTokenFromContext(ctx context.Context) (string, error) {
 		return "", ErrMissingAuthorization
 	}
 
-	return strings.TrimPrefix(bearer[0], "Bearer "), nil
+	return strings.TrimPrefix(bearer[0], authorizationPrefix), nil
+}
+
+func RetrieveTokenFromRequest(r *http.Request) (string, error) {
+	bearer := r.Header.Get(AuthorizationKey)
+	if len(bearer) <= 0 {
+		return "", ErrMissingAuthorization
+	}
+
+	return strings.TrimPrefix(bearer, authorizationPrefix), nil
 }
