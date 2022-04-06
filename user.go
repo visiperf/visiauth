@@ -1,9 +1,15 @@
 package visiauth
 
 import (
+	"context"
+
 	"github.com/bitrise-io/go-utils/sliceutil"
 	"golang.org/x/exp/maps"
 )
+
+type UserRepository interface {
+	FetchUserOrganizations(ctx context.Context, userID string) (map[string]string, error)
+}
 
 type User struct {
 	id            string

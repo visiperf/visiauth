@@ -2,17 +2,18 @@ package visiauth
 
 import (
 	"context"
-
-	"github.com/visiperf/visiauth/v2/neo4j"
+	"strings"
 )
 
 type Service struct {
-	tokenParser *TokenParser
+	tokenParser    *TokenParser
+	userRepository UserRepository
 }
 
-func NewService(jwkFetcher JwkFetcher) *Service {
+func NewService(jwkFetcher JwkFetcher, userRepository UserRepository) *Service {
 	return &Service{
-		tokenParser: NewTokenParser(jwkFetcher),
+		tokenParser:    NewTokenParser(jwkFetcher),
+		userRepository: userRepository,
 	}
 }
 
@@ -27,10 +28,12 @@ func (s *Service) User(ctx context.Context, accessToken string) (*User, error) {
 		return nil, err
 	}
 
-	user, err := neo4j.FetchUserByID(ctx, token.UserID())
+	userID := strings.Split(token.UserID(), "|")[1]
+
+	organizations, err := s.userRepository.FetchUserOrganizations(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
 
-	return NewUser(user.Id, token.Scopes(), user.Organizations), nil
+	return NewUser(userID, token.Scopes(), organizations), nil
 }

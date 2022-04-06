@@ -1,10 +1,11 @@
 package neo4j
 
-// TODO: use visiauth roles const
-var mRoles = map[string]string{
-	"WORKS_AT":   "standard",
-	"BUY_FOR":    "buyer",
-	"MANAGE":     "manager",
-	"OWN":        "owner",
-	"DEALS_WITH": "support",
+import "github.com/visiperf/visiauth/v2"
+
+var mRelationTypeRole = map[string]string{
+	"WORKS_AT":   visiauth.RoleStandard,
+	"BUY_FOR":    visiauth.RoleBuyer,
+	"MANAGE":     visiauth.RoleManager,
+	"OWN":        visiauth.RoleOwner,
+	"DEALS_WITH": visiauth.RoleSupport,
 }
