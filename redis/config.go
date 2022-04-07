@@ -8,7 +8,9 @@ import (
 
 var env struct {
 	Redis struct {
-		Addr string
+		Addr     string
+		User     string
+		Password string
 	}
 }
 

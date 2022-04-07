@@ -14,7 +14,9 @@ type JwkFetcher struct {
 func NewJwkFetcher() *JwkFetcher {
 	return &JwkFetcher{
 		client: redis.NewClient(&redis.Options{
-			Addr: env.Redis.Addr,
+			Addr:     env.Redis.Addr,
+			Username: env.Redis.User,
+			Password: env.Redis.Password,
 		}),
 	}
 }
