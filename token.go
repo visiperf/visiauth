@@ -1,9 +1,12 @@
 package visiauth
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -110,4 +113,29 @@ func RetrieveTokenFromRequest(r *http.Request) (string, error) {
 	}
 
 	return strings.TrimPrefix(bearer, authorizationPrefix), nil
+}
+
+func RetrieveTokenFromPubSubMessageAttribute(r *http.Request) (string, error) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return "", err
+	}
+	defer r.Body.Close()
+	r.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+
+	var payload struct {
+		Message struct {
+			Attributes map[string]string `json:"attributes"`
+		} `json:"message"`
+	}
+	if err := json.Unmarshal(body, &payload); err != nil {
+		return "", err
+	}
+
+	token, ok := payload.Message.Attributes[AuthorizationKey]
+	if !ok {
+		return "", ErrMissingAuthorization
+	}
+
+	return token, nil
 }
