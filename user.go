@@ -64,3 +64,11 @@ func (u User) HasOneOfRolesInOrganization(organizationId string, roles ...string
 
 	return false
 }
+
+func (u User) HighestRoleInOrganizations() map[string]string {
+	return u.organizations
+}
+
+func (u User) HighestRoleInOrganization(organizationId string) string {
+	return u.organizations[organizationId]
+}
