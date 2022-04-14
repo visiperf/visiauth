@@ -17,6 +17,14 @@ func NewUserRepository() *UserRepository {
 }
 
 func (r *UserRepository) FetchUserOrganizations(ctx context.Context, userID string) (map[string]string, error) {
+	driver, err := neo4j.NewDriver(env.Neo4j.Uri, neo4j.BasicAuth(env.Neo4j.User, env.Neo4j.Password, ""), func(c *neo4j.Config) {
+		c.Log = neo4j.ConsoleLogger(neo4j.DEBUG)
+	})
+	if err != nil {
+		return nil, err
+	}
+	defer driver.Close()
+
 	session := driver.NewSession(r.config)
 	defer session.Close()
 
