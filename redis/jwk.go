@@ -8,22 +8,25 @@ import (
 )
 
 type JwkFetcher struct {
-	client *redis.Client
+	options *redis.Options
 }
 
 func NewJwkFetcher() *JwkFetcher {
 	return &JwkFetcher{
-		client: redis.NewClient(&redis.Options{
+		options: &redis.Options{
 			Addr:     env.Redis.Addr,
 			Username: env.Redis.User,
 			Password: env.Redis.Password,
-		}),
+		},
 	}
 }
 
 func (f *JwkFetcher) FetchJwk(ctx context.Context, kid string) (*visiauth.Jwk, error) {
+	client := redis.NewClient(f.options)
+	defer client.Close()
+
 	var jwk visiauth.Jwk
-	if err := f.client.Get(ctx, kid).Scan(&jwk); err != nil {
+	if err := client.Get(ctx, kid).Scan(&jwk); err != nil {
 		return nil, err
 	}
 
