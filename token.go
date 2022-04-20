@@ -137,5 +137,5 @@ func RetrieveTokenFromPubSubMessageAttribute(r *http.Request) (string, error) {
 		return "", ErrMissingAuthorization
 	}
 
-	return token, nil
+	return strings.TrimPrefix(token, authorizationPrefix), nil
 }
