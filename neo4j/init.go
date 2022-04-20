@@ -1,5 +1,13 @@
 package neo4j
 
+import (
+	"log"
+
+	"github.com/visiperf/visiauth/v2/config"
+)
+
 func init() {
-	initConfig()
+	if err := config.Init(&env); err != nil {
+		log.Fatal(err)
+	}
 }
