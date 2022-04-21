@@ -29,14 +29,14 @@ func (r *UserRepository) FetchUserOrganizations(ctx context.Context, userID stri
 	defer session.Close()
 
 	res, err := session.Run(`
-		match (u:User {user_id: $user_id})-[ruo:WORKS_AT|BUY_FOR|MANAGE|OWN|DEALS_WITH]->(o:Organization)
-		return o.organization_id as organization_id, type(ruo) as role
-		union all
 		match (u:User {user_id: $user_id})-[ruh:WORKS_AT|BUY_FOR|MANAGE|OWN]->(h:Organization)-[rhn:HEAD_OF]->(n:Network)<-[ron:IN]-(o:Organization)
 		return o.organization_id as organization_id, 'WORKS_AT' as role
-		union all
+			union all
 		match (u:User {user_id: $user_id})-[ruh:DEALS_WITH]->(h:Organization)-[rhn:HEAD_OF]->(n:Network)<-[ron:IN]-(o:Organization)
 		return o.organization_id as organization_id, 'DEALS_WITH' as role
+			union all
+		match (u:User {user_id: $user_id})-[ruo:WORKS_AT|BUY_FOR|MANAGE|OWN|DEALS_WITH]->(o:Organization)
+		return o.organization_id as organization_id, type(ruo) as role
 	`, map[string]interface{}{
 		"user_id": userID,
 	})
