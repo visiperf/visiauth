@@ -30,10 +30,10 @@ func (s *Service) User(ctx context.Context, accessToken string) (*User, error) {
 
 	userID := strings.Split(token.UserID(), "|")[1]
 
-	organizations, err := s.userRepository.FetchUserOrganizations(ctx, userID)
+	organizations, legacyIds, err := s.userRepository.FetchUserOrganizations(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
 
-	return NewUser(userID, token.Scopes(), organizations), nil
+	return NewUser(userID, token.Scopes(), organizations, legacyIds), nil
 }

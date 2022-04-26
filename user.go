@@ -8,17 +8,18 @@ import (
 )
 
 type UserRepository interface {
-	FetchUserOrganizations(ctx context.Context, userID string) (map[string]string, error)
+	FetchUserOrganizations(ctx context.Context, userID string) (map[string]string, []string, error)
 }
 
 type User struct {
 	id            string
 	scopes        []string
 	organizations map[string]string
+	legacyIds     []string
 }
 
-func NewUser(id string, scopes []string, organizations map[string]string) *User {
-	return &User{id, scopes, organizations}
+func NewUser(id string, scopes []string, organizations map[string]string, legacyIds []string) *User {
+	return &User{id, scopes, organizations, legacyIds}
 }
 
 func (u User) ID() string {
@@ -35,6 +36,10 @@ func (u User) HasScope(scope string) bool {
 
 func (u User) OrganizationIds() []string {
 	return maps.Keys(u.organizations)
+}
+
+func (u User) OrganizationLegacyIds() []string {
+	return u.legacyIds
 }
 
 func (u User) OrganizationRoles() map[string][]string {
