@@ -28,12 +28,5 @@ func (s *Service) User(ctx context.Context, accessToken string) (*User, error) {
 		return nil, err
 	}
 
-	userID := strings.Split(token.UserID(), "|")[1]
-
-	organizations, legacyIds, err := s.userRepository.FetchUserOrganizations(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-
-	return NewUser(userID, token.Scopes(), organizations, legacyIds), nil
+	return s.userRepository.FetchUserByID(ctx, strings.Split(token.UserID(), "|")[1], token.Scopes())
 }
