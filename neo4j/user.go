@@ -19,7 +19,7 @@ func NewUserRepository() *UserRepository {
 
 func (r *UserRepository) FetchUserByID(ctx context.Context, userID string, scopes []string) (*visiauth.User, error) {
 	driver, err := neo4j.NewDriver(env.Neo4j.Uri, neo4j.BasicAuth(env.Neo4j.User, env.Neo4j.Password, ""), func(c *neo4j.Config) {
-		c.Log = neo4j.ConsoleLogger(neo4j.DEBUG)
+		c.Log = neo4j.ConsoleLogger(neo4j.ERROR)
 	})
 	if err != nil {
 		return nil, err
