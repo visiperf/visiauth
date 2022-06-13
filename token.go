@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -24,32 +23,82 @@ var (
 	ErrMissingAuthorization = errors.New("missing authorization")
 )
 
-type UserToken struct {
+type Token interface {
+	Header() map[string]interface{}
+	Kid() string
+	Alg() string
+	Typ() string
+	Claims() map[string]interface{}
+	Iss() string
+	Sub() string
+	Aud() string
+	Iat() string
+	Exp() string
+	Azp() string
+}
+
+type token struct {
 	*jwt.Token
 }
 
-func NewUserToken(token *jwt.Token) *UserToken {
-	return &UserToken{token}
+func newToken(t *jwt.Token) *token {
+	return &token{t}
 }
 
-func (t UserToken) Header() map[string]interface{} {
+func (t token) Header() map[string]interface{} {
 	return t.Token.Header
 }
 
-func (t UserToken) Kid() string {
+func (t token) Kid() string {
 	return t.Header()["kid"].(string)
 }
 
-func (t UserToken) Claims() map[string]interface{} {
+func (t token) Alg() string {
+	return t.Header()["alg"].(string)
+}
+
+func (t token) Typ() string {
+	return t.Header()["typ"].(string)
+}
+
+func (t token) Claims() map[string]interface{} {
 	return t.Token.Claims.(jwt.MapClaims)
 }
 
-func (t UserToken) UserID() string {
-	return t.Claims()[t.customKey("user_id")].(string)
+func (t token) Iss() string {
+	return t.Claims()["iss"].(string)
 }
 
-func (t UserToken) Iss() string {
-	return t.Claims()["iss"].(string)
+func (t token) Sub() string {
+	return t.Claims()["sub"].(string)
+}
+
+func (t token) Aud() string {
+	return t.Claims()["aud"].(string)
+}
+
+func (t token) Iat() string {
+	return t.Claims()["iat"].(string)
+}
+
+func (t token) Exp() string {
+	return t.Claims()["exp"].(string)
+}
+
+func (t token) Azp() string {
+	return t.Claims()["azp"].(string)
+}
+
+type UserToken struct {
+	*token
+}
+
+func NewUserToken(token *jwt.Token) *UserToken {
+	return &UserToken{newToken(token)}
+}
+
+func (t UserToken) UserID() string {
+	return t.Claims()["sub"].(string)
 }
 
 func (t UserToken) Scopes() []string {
@@ -60,8 +109,12 @@ func (t UserToken) scope() string {
 	return t.Claims()["scope"].(string)
 }
 
-func (t UserToken) customKey(key string) string {
-	return fmt.Sprintf("%s%s", t.Iss(), key)
+type MachineToken struct {
+	*token
+}
+
+func NewMachineToken(token *jwt.Token) *MachineToken {
+	return &MachineToken{newToken(token)}
 }
 
 type TokenParser struct {
