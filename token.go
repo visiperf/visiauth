@@ -24,43 +24,43 @@ var (
 	ErrMissingAuthorization = errors.New("missing authorization")
 )
 
-type Token struct {
+type UserToken struct {
 	*jwt.Token
 }
 
-func NewToken(token *jwt.Token) *Token {
-	return &Token{token}
+func NewUserToken(token *jwt.Token) *UserToken {
+	return &UserToken{token}
 }
 
-func (t Token) Header() map[string]interface{} {
+func (t UserToken) Header() map[string]interface{} {
 	return t.Token.Header
 }
 
-func (t Token) Kid() string {
+func (t UserToken) Kid() string {
 	return t.Header()["kid"].(string)
 }
 
-func (t Token) Claims() map[string]interface{} {
+func (t UserToken) Claims() map[string]interface{} {
 	return t.Token.Claims.(jwt.MapClaims)
 }
 
-func (t Token) UserID() string {
+func (t UserToken) UserID() string {
 	return t.Claims()[t.customKey("user_id")].(string)
 }
 
-func (t Token) Iss() string {
+func (t UserToken) Iss() string {
 	return t.Claims()["iss"].(string)
 }
 
-func (t Token) Scopes() []string {
+func (t UserToken) Scopes() []string {
 	return strings.Split(t.scope(), " ")
 }
 
-func (t Token) scope() string {
+func (t UserToken) scope() string {
 	return t.Claims()["scope"].(string)
 }
 
-func (t Token) customKey(key string) string {
+func (t UserToken) customKey(key string) string {
 	return fmt.Sprintf("%s%s", t.Iss(), key)
 }
 
@@ -72,18 +72,18 @@ func NewTokenParser(jwkFetcher JwkFetcher) *TokenParser {
 	return &TokenParser{NewCertificateFetcher(jwkFetcher)}
 }
 
-func (p *TokenParser) ParseToken(ctx context.Context, accessToken string) (*Token, error) {
+func (p *TokenParser) ParseToken(ctx context.Context, accessToken string) (*UserToken, error) {
 	token, err := jwt.Parse(accessToken, p.keyFunc(ctx))
 	if err != nil {
 		return nil, err
 	}
 
-	return NewToken(token), nil
+	return NewUserToken(token), nil
 }
 
 func (p *TokenParser) keyFunc(ctx context.Context) func(token *jwt.Token) (interface{}, error) {
 	return func(token *jwt.Token) (interface{}, error) {
-		cert, err := p.certificateFetcher.FetchPEMCertificate(ctx, NewToken(token))
+		cert, err := p.certificateFetcher.FetchPEMCertificate(ctx, NewUserToken(token))
 		if err != nil {
 			return nil, err
 		}
