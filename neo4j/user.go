@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
-	"github.com/visiperf/visiauth/v2"
+	"github.com/visiperf/visiauth/v3"
 )
 
 type UserRepository struct {

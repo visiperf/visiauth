@@ -3,7 +3,7 @@ package neo4j
 import (
 	"log"
 
-	"github.com/visiperf/visiauth/v2/config"
+	"github.com/visiperf/visiauth/v3/config"
 )
 
 func init() {

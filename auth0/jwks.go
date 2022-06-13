@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/visiperf/visiauth/v2"
+	"github.com/visiperf/visiauth/v3"
 )
 
 const (

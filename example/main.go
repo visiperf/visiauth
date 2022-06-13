@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 
-	"github.com/visiperf/visiauth/v2"
-	"github.com/visiperf/visiauth/v2/neo4j"
-	"github.com/visiperf/visiauth/v2/redis"
+	"github.com/visiperf/visiauth/v3"
+	"github.com/visiperf/visiauth/v3/neo4j"
+	"github.com/visiperf/visiauth/v3/redis"
 )
 
 func main() {
