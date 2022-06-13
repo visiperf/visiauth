@@ -83,7 +83,7 @@ func (p *TokenParser) ParseToken(ctx context.Context, accessToken string) (*User
 
 func (p *TokenParser) keyFunc(ctx context.Context) func(token *jwt.Token) (interface{}, error) {
 	return func(token *jwt.Token) (interface{}, error) {
-		cert, err := p.certificateFetcher.FetchPEMCertificate(ctx, NewUserToken(token))
+		cert, err := p.certificateFetcher.FetchPEMCertificate(ctx, token.Header["kid"].(string))
 		if err != nil {
 			return nil, err
 		}

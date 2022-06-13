@@ -13,8 +13,8 @@ func NewCertificateFetcher(jwkFetcher JwkFetcher) *CertificateFetcher {
 	return &CertificateFetcher{jwkFetcher}
 }
 
-func (f *CertificateFetcher) FetchPEMCertificate(ctx context.Context, token *UserToken) ([]byte, error) {
-	jwk, err := f.jwkFetcher.FetchJwk(ctx, token.Kid())
+func (f *CertificateFetcher) FetchPEMCertificate(ctx context.Context, kid string) ([]byte, error) {
+	jwk, err := f.jwkFetcher.FetchJwk(ctx, kid)
 	if err != nil {
 		return nil, err
 	}
