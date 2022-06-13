@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -18,10 +19,23 @@ const (
 	authorizationPrefix = "Bearer "
 )
 
+const (
+	authenticableTypeKey = "authenticable_type"
+)
+
 var (
 	ErrMissingMetadata      = errors.New("missing metadata")
 	ErrMissingAuthorization = errors.New("missing authorization")
 )
+
+var mAuthenticableTypeTokenFactory = map[string]func(token *jwt.Token) Token{
+	"user": func(token *jwt.Token) Token {
+		return NewUserToken(token)
+	},
+	"machine": func(token *jwt.Token) Token {
+		return NewMachineToken(token)
+	},
+}
 
 type Token interface {
 	Header() map[string]interface{}
@@ -98,7 +112,7 @@ func NewUserToken(token *jwt.Token) *UserToken {
 }
 
 func (t UserToken) UserID() string {
-	return t.Claims()["sub"].(string)
+	return t.Sub()
 }
 
 func (t UserToken) Scopes() []string {
@@ -113,6 +127,10 @@ type MachineToken struct {
 	*token
 }
 
+func (t MachineToken) AppID() string {
+	return t.Sub()
+}
+
 func NewMachineToken(token *jwt.Token) *MachineToken {
 	return &MachineToken{newToken(token)}
 }
@@ -125,13 +143,18 @@ func NewTokenParser(jwkFetcher JwkFetcher) *TokenParser {
 	return &TokenParser{NewCertificateFetcher(jwkFetcher)}
 }
 
-func (p *TokenParser) ParseToken(ctx context.Context, accessToken string) (*UserToken, error) {
+func (p *TokenParser) ParseToken(ctx context.Context, accessToken string) (Token, error) {
 	token, err := jwt.Parse(accessToken, p.keyFunc(ctx))
 	if err != nil {
 		return nil, err
 	}
 
-	return NewUserToken(token), nil
+	fn, ok := mAuthenticableTypeTokenFactory[fmt.Sprintf("%s%s", token.Claims.(jwt.MapClaims)["iss"].(string), authenticableTypeKey)]
+	if !ok {
+		return nil, errors.New("unknown authenticable type")
+	}
+
+	return fn(token), nil
 }
 
 func (p *TokenParser) keyFunc(ctx context.Context) func(token *jwt.Token) (interface{}, error) {

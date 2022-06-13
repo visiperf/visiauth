@@ -2,6 +2,7 @@ package visiauth
 
 import (
 	"context"
+	"errors"
 	"strings"
 )
 
@@ -17,16 +18,26 @@ func NewService(jwkFetcher JwkFetcher, userRepository UserRepository) *Service {
 	}
 }
 
-func (s *Service) Validate(ctx context.Context, accessToken string) error {
-	_, err := s.tokenParser.ParseToken(ctx, accessToken)
-	return err
-}
-
-func (s *Service) User(ctx context.Context, accessToken string) (*User, error) {
+func (s *Service) DecodeAccessToken(ctx context.Context, accessToken string) (Authenticable, error) {
 	token, err := s.tokenParser.ParseToken(ctx, accessToken)
 	if err != nil {
 		return nil, err
 	}
 
+	switch t := token.(type) {
+	case *UserToken:
+		return s.user(ctx, t)
+	case *MachineToken:
+		return s.app(ctx, t)
+	}
+
+	return nil, errors.New("unknown token type")
+}
+
+func (s *Service) app(ctx context.Context, token *MachineToken) (Authenticable, error) {
+	return NewApp(token.AppID()), nil
+}
+
+func (s *Service) user(ctx context.Context, token *UserToken) (Authenticable, error) {
 	return s.userRepository.FetchUserByID(ctx, strings.Split(token.UserID(), "|")[1], token.Scopes())
 }
