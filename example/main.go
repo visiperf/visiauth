@@ -10,12 +10,9 @@ import (
 )
 
 func main() {
-	user, err := visiauth.NewService(
-		redis.NewJwkFetcher(),
-		neo4j.NewUserRepository(),
-	).User(context.Background(), env.Visiauth.Token)
+	authenticable, err := visiauth.NewService(redis.NewJwkFetcher(), neo4j.NewUserRepository()).DecodeAccessToken(context.Background(), env.Visiauth.Token)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(user)
+	log.Println(authenticable)
 }
