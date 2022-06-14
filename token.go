@@ -128,7 +128,7 @@ type MachineToken struct {
 }
 
 func (t MachineToken) AppID() string {
-	return t.Sub()
+	return t.Azp()
 }
 
 func NewMachineToken(token *jwt.Token) *MachineToken {
@@ -149,7 +149,10 @@ func (p *TokenParser) ParseToken(ctx context.Context, accessToken string) (Token
 		return nil, err
 	}
 
-	fn, ok := mTokenTypeTokenFactory[fmt.Sprintf("%s%s", token.Claims.(jwt.MapClaims)["iss"].(string), tokenTypeKey)]
+	k := fmt.Sprintf("%s%s", token.Claims.(jwt.MapClaims)["iss"].(string), tokenTypeKey)
+	tt := token.Claims.(jwt.MapClaims)[k].(string)
+
+	fn, ok := mTokenTypeTokenFactory[tt]
 	if !ok {
 		return nil, errors.New("unknown token type")
 	}
