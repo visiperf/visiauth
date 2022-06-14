@@ -20,7 +20,7 @@ const (
 )
 
 const (
-	authenticableTypeKey = "authenticable_type"
+	tokenTypeKey = "token_type"
 )
 
 var (
@@ -28,7 +28,7 @@ var (
 	ErrMissingAuthorization = errors.New("missing authorization")
 )
 
-var mAuthenticableTypeTokenFactory = map[string]func(token *jwt.Token) Token{
+var mTokenTypeTokenFactory = map[string]func(token *jwt.Token) Token{
 	"user": func(token *jwt.Token) Token {
 		return NewUserToken(token)
 	},
@@ -149,9 +149,9 @@ func (p *TokenParser) ParseToken(ctx context.Context, accessToken string) (Token
 		return nil, err
 	}
 
-	fn, ok := mAuthenticableTypeTokenFactory[fmt.Sprintf("%s%s", token.Claims.(jwt.MapClaims)["iss"].(string), authenticableTypeKey)]
+	fn, ok := mTokenTypeTokenFactory[fmt.Sprintf("%s%s", token.Claims.(jwt.MapClaims)["iss"].(string), tokenTypeKey)]
 	if !ok {
-		return nil, errors.New("unknown authenticable type")
+		return nil, errors.New("unknown token type")
 	}
 
 	return fn(token), nil
