@@ -76,3 +76,23 @@ if !ok {
 }
 ```
 
+## Env vars
+
+Some environment vars are required to use `visiauth`.
+Only vars of imported subpackages must be set.
+
+### Redis
+
+- VISIAUTH_REDIS_ADDR
+- VISIAUTH_REDIS_USER
+- VISIAUTH_REDIS_PASSWORD
+
+### Auth0
+
+- VISIAUTH_AUTH0_DOMAIN
+
+### Neo4j
+
+- VISIAUTH_NEO4J_USER
+- VISIAUTH_NEO4J_URI
+- VISIAUTH_NEO4J_PASSWORD
