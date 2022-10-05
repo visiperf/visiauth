@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 )
@@ -27,6 +28,14 @@ func (i internal) String() string {
 
 func (i internal) Error() string {
 	return i.String()
+}
+
+func (i internal) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Message string `json:"message"`
+	}{
+		Message: i.Message(),
+	})
 }
 
 func IsInternal(err error) bool {

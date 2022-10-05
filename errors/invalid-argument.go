@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 )
@@ -31,6 +32,16 @@ func (ia invalidArgument) String() string {
 
 func (ia invalidArgument) Error() string {
 	return ia.String()
+}
+
+func (ia invalidArgument) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Message string `json:"message"`
+		Code    string `json:"code"`
+	}{
+		Message: ia.Message(),
+		Code:    ia.Code(),
+	})
 }
 
 func IsInvalidArgument(err error) bool {

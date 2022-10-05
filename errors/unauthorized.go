@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 )
@@ -31,6 +32,16 @@ func (u unauthorized) String() string {
 
 func (u unauthorized) Error() string {
 	return u.String()
+}
+
+func (u unauthorized) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Message string `json:"message"`
+		Code    string `json:"code"`
+	}{
+		Message: u.Message(),
+		Code:    u.Code(),
+	})
 }
 
 func IsUnauthorized(err error) bool {
