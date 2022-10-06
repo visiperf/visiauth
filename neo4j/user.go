@@ -5,6 +5,7 @@ import (
 
 	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
 	"github.com/visiperf/visiauth/v3"
+	"github.com/visiperf/visiauth/v3/errors"
 )
 
 type UserRepository struct {
@@ -22,7 +23,7 @@ func (r *UserRepository) FetchUserByID(ctx context.Context, userID string, scope
 		c.Log = neo4j.ConsoleLogger(neo4j.ERROR)
 	})
 	if err != nil {
-		return nil, err
+		return nil, errors.Internal(err)
 	}
 	defer driver.Close()
 
@@ -49,12 +50,12 @@ func (r *UserRepository) fetchUserLegacyID(_ context.Context, session neo4j.Sess
 		"user_id": userID,
 	})
 	if err != nil {
-		return "", err
+		return "", errors.Internal(err)
 	}
 
 	rec, err := res.Single()
 	if err != nil {
-		return "", err
+		return "", errors.Internal(err)
 	}
 
 	return rec.Values[0].(string), nil
@@ -74,7 +75,7 @@ func (r *UserRepository) fetchUserOrganizations(_ context.Context, session neo4j
 		"user_id": userID,
 	})
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.Internal(err)
 	}
 
 	m := make(map[string]string)
@@ -89,7 +90,7 @@ func (r *UserRepository) fetchUserOrganizations(_ context.Context, session neo4j
 	}
 
 	if err := res.Err(); err != nil {
-		return nil, nil, err
+		return nil, nil, errors.Internal(err)
 	}
 
 	return m, s, nil
