@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/visiperf/visiauth/v3/errors"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -24,8 +24,8 @@ const (
 )
 
 var (
-	ErrMissingMetadata      = errors.New("missing metadata")
-	ErrMissingAuthorization = errors.New("missing authorization")
+	ErrMissingMetadata      = fmt.Errorf("missing metadata")
+	ErrMissingAuthorization = fmt.Errorf("missing authorization")
 )
 
 var mTokenTypeTokenFactory = map[string]func(token *jwt.Token) Token{
@@ -146,7 +146,15 @@ func NewTokenParser(jwkFetcher JwkFetcher) *TokenParser {
 func (p *TokenParser) ParseToken(ctx context.Context, accessToken string) (Token, error) {
 	token, err := jwt.Parse(accessToken, p.keyFunc(ctx))
 	if err != nil {
-		return nil, err
+		if e, ok := err.(*jwt.ValidationError); ok && e.Inner != nil {
+			err = e.Inner
+		}
+
+		if errors.IsInternal(err) {
+			return nil, err
+		}
+
+		return nil, errors.Unauthorized(err.Error(), "INVALID_TOKEN")
 	}
 
 	k := fmt.Sprintf("%s%s", token.Claims.(jwt.MapClaims)["iss"].(string), tokenTypeKey)
@@ -154,7 +162,7 @@ func (p *TokenParser) ParseToken(ctx context.Context, accessToken string) (Token
 
 	fn, ok := mTokenTypeTokenFactory[tt]
 	if !ok {
-		return nil, errors.New("unknown token type")
+		return nil, errors.Internal(fmt.Errorf("unknown token type"))
 	}
 
 	return fn(token), nil

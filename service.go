@@ -2,8 +2,10 @@ package visiauth
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"strings"
+
+	"github.com/visiperf/visiauth/v3/errors"
 )
 
 type Service struct {
@@ -31,7 +33,7 @@ func (s *Service) DecodeAccessToken(ctx context.Context, accessToken string) (Au
 		return s.app(ctx, t)
 	}
 
-	return nil, errors.New("unknown token type")
+	return nil, errors.Internal(fmt.Errorf("unknown token type"))
 }
 
 func (s *Service) app(ctx context.Context, token *MachineToken) (Authenticable, error) {
