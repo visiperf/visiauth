@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/visiperf/visiauth/v3"
+	"github.com/visiperf/visiauth/v3/errors"
 )
 
 type JwkFetcher struct {
@@ -27,7 +28,11 @@ func (f *JwkFetcher) FetchJwk(ctx context.Context, kid string) (*visiauth.Jwk, e
 
 	var jwk visiauth.Jwk
 	if err := client.Get(ctx, kid).Scan(&jwk); err != nil {
-		return nil, err
+		if IsErrRedisNilMessage(err) {
+			return nil, errors.NotFound("jwk", "JWK_NOT_FOUND")
+		}
+
+		return nil, errors.Internal(err)
 	}
 
 	return &jwk, nil
