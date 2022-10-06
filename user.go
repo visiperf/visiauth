@@ -2,6 +2,7 @@ package visiauth
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/bitrise-io/go-utils/sliceutil"
 	"golang.org/x/exp/maps"
@@ -83,4 +84,20 @@ func (u User) HighestRoleInOrganizations() map[string]string {
 
 func (u User) HighestRoleInOrganization(organizationId string) string {
 	return u.organizationsRole[organizationId]
+}
+
+func (u User) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		ID                    string              `json:"id"`
+		LegacyID              string              `json:"legacyId"`
+		Scopes                []string            `json:"scopes"`
+		OrganizationsRole     map[string][]string `json:"organizationsRole"`
+		OrganizationLegacyIDs []string            `json:"organizationLegacyIds"`
+	}{
+		ID:                    u.ID(),
+		LegacyID:              u.LegacyID(),
+		Scopes:                u.Scopes(),
+		OrganizationsRole:     u.OrganizationRoles(),
+		OrganizationLegacyIDs: u.OrganizationLegacyIds(),
+	})
 }
