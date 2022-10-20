@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/visiperf/visiauth/v3"
 	"github.com/visiperf/visiauth/v3/errors"
+	"github.com/visiperf/visiauth/v3/visiauth"
 )
 
 type JwkFetcher struct {

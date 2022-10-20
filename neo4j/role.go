@@ -1,6 +1,6 @@
 package neo4j
 
-import "github.com/visiperf/visiauth/v3"
+import "github.com/visiperf/visiauth/v3/visiauth"
 
 var mRelationTypeRole = map[string]string{
 	"WORKS_AT":   visiauth.RoleStandard,
