@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/visiperf/visiauth/v3/api/renderer"
 	"github.com/visiperf/visiauth/v3/errors"
 	"github.com/visiperf/visiauth/v3/neo4j"
 	"github.com/visiperf/visiauth/v3/redis"
+	"github.com/visiperf/visiauth/v3/renderer"
 	"github.com/visiperf/visiauth/v3/visiauth"
 )
 
