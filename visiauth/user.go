@@ -93,11 +93,13 @@ func (u User) MarshalJSON() ([]byte, error) {
 		Scopes                []string            `json:"scopes"`
 		OrganizationsRole     map[string][]string `json:"organizationsRole"`
 		OrganizationLegacyIDs []string            `json:"organizationLegacyIds"`
+		Type                  string              `json:"type"`
 	}{
 		ID:                    u.ID(),
 		LegacyID:              u.LegacyID(),
 		Scopes:                u.Scopes(),
 		OrganizationsRole:     u.OrganizationRoles(),
 		OrganizationLegacyIDs: u.OrganizationLegacyIds(),
+		Type:                  "user",
 	})
 }

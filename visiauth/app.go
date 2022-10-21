@@ -16,8 +16,10 @@ func (a App) ID() string {
 
 func (a App) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
-		ID string `json:"id"`
+		ID   string `json:"id"`
+		Type string `json:"type"`
 	}{
-		ID: a.ID(),
+		ID:   a.ID(),
+		Type: "app",
 	})
 }
