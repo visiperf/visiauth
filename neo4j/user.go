@@ -8,6 +8,12 @@ import (
 	"github.com/visiperf/visiauth/v3/errors"
 )
 
+type userInfo struct {
+	LegacyID string
+	Name     string
+	Email    string
+}
+
 type UserRepository struct {
 	config neo4j.SessionConfig
 }
@@ -30,7 +36,7 @@ func (r *UserRepository) FetchUserByID(ctx context.Context, userID string, scope
 	session := driver.NewSession(r.config)
 	defer session.Close()
 
-	legacyID, err := r.fetchUserLegacyID(ctx, session, userID)
+	info, err := r.fetchUserInfo(ctx, session, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -40,25 +46,29 @@ func (r *UserRepository) FetchUserByID(ctx context.Context, userID string, scope
 		return nil, err
 	}
 
-	return visiauth.NewUser(userID, legacyID, scopes, organizationsRole, organizationLegacyIDs), nil
+	return visiauth.NewUser(userID, info.Name, info.Email, info.LegacyID, scopes, organizationsRole, organizationLegacyIDs), nil
 }
 
-func (r *UserRepository) fetchUserLegacyID(_ context.Context, session neo4j.Session, userID string) (string, error) {
+func (r *UserRepository) fetchUserInfo(_ context.Context, session neo4j.Session, userID string) (userInfo, error) {
 	res, err := session.Run(`
-		match (u:User {user_id: $user_id}) return u.legacy_id as legacy_id
+		match (u:User {user_id: $user_id}) return u.legacy_id as legacy_id, u.name as name, u.email as email
 	`, map[string]interface{}{
 		"user_id": userID,
 	})
 	if err != nil {
-		return "", errors.Internal(err)
+		return userInfo{}, errors.Internal(err)
 	}
 
 	rec, err := res.Single()
 	if err != nil {
-		return "", errors.Internal(err)
+		return userInfo{}, errors.Internal(err)
 	}
 
-	return rec.Values[0].(string), nil
+	return userInfo{
+		LegacyID: rec.Values[0].(string),
+		Name:     rec.Values[1].(string),
+		Email:    rec.Values[2].(string),
+	}, nil
 }
 
 func (r *UserRepository) fetchUserOrganizations(_ context.Context, session neo4j.Session, userID string) (map[string]string, []string, error) {

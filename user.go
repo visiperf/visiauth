@@ -14,18 +14,28 @@ type UserRepository interface {
 
 type User struct {
 	id                    string
+	name                  string
+	email                 string
 	legacyID              string
 	scopes                []string
 	organizationsRole     map[string]string
 	organizationLegacyIDs []string
 }
 
-func NewUser(id, legacyID string, scopes []string, organizationsRole map[string]string, organizationLegacyIDs []string) *User {
-	return &User{id, legacyID, scopes, organizationsRole, organizationLegacyIDs}
+func NewUser(id, name, email, legacyID string, scopes []string, organizationsRole map[string]string, organizationLegacyIDs []string) *User {
+	return &User{id, name, email, legacyID, scopes, organizationsRole, organizationLegacyIDs}
 }
 
 func (u User) ID() string {
 	return u.id
+}
+
+func (u User) Name() string {
+	return u.name
+}
+
+func (u User) Email() string {
+	return u.email
 }
 
 func (u User) LegacyID() string {
@@ -89,12 +99,16 @@ func (u User) HighestRoleInOrganization(organizationId string) string {
 func (u User) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		ID                    string              `json:"id"`
+		Name                  string              `json:"name"`
+		Email                 string              `json:"email"`
 		LegacyID              string              `json:"legacyId"`
 		Scopes                []string            `json:"scopes"`
 		OrganizationsRole     map[string][]string `json:"organizationsRole"`
 		OrganizationLegacyIDs []string            `json:"organizationLegacyIds"`
 	}{
 		ID:                    u.ID(),
+		Name:                  u.Name(),
+		Email:                 u.Email(),
 		LegacyID:              u.LegacyID(),
 		Scopes:                u.Scopes(),
 		OrganizationsRole:     u.OrganizationRoles(),
